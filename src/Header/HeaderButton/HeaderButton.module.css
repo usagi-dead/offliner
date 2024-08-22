@@ -1,20 +1,18 @@
-.busketButton, .itemButton {
+.itemButton {
     display: flex;
     flex-direction: row;
     align-items: center;
     border: none;
     background-color: var(--main-color);
     cursor: pointer;
-    transition: scale 0.3s, background-color 0.3s;
+    transition: scale 0.5s, background-color 0.3s;
     text-decoration: none;
+    width: 50px;
+    justify-content: center;
 }
 
-.busketButton {
-    width: 46px;
-}
-
-.busketButton:hover, .itemButton:hover {
-    scale: 1.1;
+.itemButton:hover {
+    scale: 1.2;
     transition: all 0.3s;
     --primary-color: #025ADD;
 }
@@ -25,7 +23,7 @@
     position: absolute;
     background-color: #025ADD;
     border-radius: 100px;
-    margin: 0px 0px 40px 22px;
+    margin: 0px 0px 40px 28px;
     display: flex;
     align-items: center;
     justify-content: center;

@@ -1,7 +1,6 @@
 import React from 'react';
 import "./Header.css";
 import HeaderButton from './HeaderButton/HeaderButton';
-import ThemeSwitchButton from './ThemeSwitchButton/ThemeSwitchButton';
 import Search from './Search/Search';
 import Navigation from './Navigation/Navigation';
 import { Link } from 'react-router-dom';
@@ -19,7 +18,9 @@ export default function Header() {
 
                 <div className='buttons-container'>
 
-                    <ThemeSwitchButton />
+                    <HeaderButton 
+                        svg="theme"
+                    />
 
                     <HeaderButton 
                         link="/"
@@ -34,7 +35,6 @@ export default function Header() {
                     <HeaderButton 
                         link="/"
                         svg="busket"
-                        isBusket="1"
                     />
 
                 </div>

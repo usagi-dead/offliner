@@ -1,8 +1,8 @@
-import classes from "./ThemeSwitchButton.module.css"
-import svgIcons from "../../svgIcons";
+import classes from "../HeaderButton.module.css"
+import svgIcons from "../../../svgIcons";
 import React, { useState } from 'react';
 
-export default function ThemeSwitchButton() {
+export default function ThemeToggle() {
     const [isDarkTheme, setIsDarkTheme] = useState(false);
 
     const toggleTheme = () => {
@@ -12,7 +12,7 @@ export default function ThemeSwitchButton() {
     };
 
     return (
-        <button onClick={toggleTheme} className={classes.themeButton}>
+        <button onClick={toggleTheme} className={classes.itemButton}>
             {svgIcons[isDarkTheme ? 'white' : 'black']}
         </button>
     )

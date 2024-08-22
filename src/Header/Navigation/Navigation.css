@@ -3,27 +3,29 @@
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
-    width: 98%;
-    padding: 10px 1%;
-    background-color: var(--second-accent-color);
-    border-radius: 30px;
     font-weight: 300;
-    font-size: 18px;
-    margin: 0px 0px 39px 0px;
-    transition: background-color 0.3s;
+    font-size: 14px;
+    padding: 0px;
+    margin: 0px;
 }
 
 .nav-container {
-    width: 76vw;
+    width: calc(76vw - 20px);
     margin: 0px auto;
+    background-color: var(--second-accent-color);
+    border-radius: 24px;
+    height: fit-content;
+    margin: 0px 0px 39px 0px;
+    padding: 10px;
+    transition: background-color 0.3s;
 }
 
 .nav-item {
     cursor: pointer;
     transition: color 0.3s, background-color 0.3s;
     padding: 5px 12px;
-    margin: 5px 0px;
-    border-radius: 20px;
+    margin: 0px;
+    border-radius: 30px;
 }
 
 .nav-item:hover {
