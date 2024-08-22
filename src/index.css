@@ -1,0 +1,31 @@
+:root {
+    --background-color: #F5F5F5;
+    --main-color: white;
+    --text-color: black;
+    --second-color: #D9D9D9;
+    --accent-color: #025ADD;
+    --second-accent-color: #EEF3FB;
+    --shadow: rgba(0, 0, 0, 0.2);
+    --extra-shadow: rgba(0, 0, 0, 0.3);
+    --primary-color: black;
+}
+
+[data-theme="black"] {
+    --background-color: #000000;
+    --main-color: #1b1b1b;
+    --text-color: white;
+    --second-color: #424242;
+    --accent-color: #025ADD;
+    --second-accent-color: #303037;
+    --shadow: rgba(150, 150, 150, 0.2);
+    --extra-shadow: rgba(150, 150, 150, 0.3);
+    --primary-color: white;
+}
+
+body {
+    margin: 0px;
+    background-color: var(--background-color);
+    color: var(--text-color);
+    transition: background-color 0.3s, color 0.3s;
+    font-family: "Montserrat";
+}

@@ -1,0 +1,23 @@
+.vish-page {
+    width: 76vw;
+    margin: 39px auto;
+    height: fit-content;
+}
+
+.vish-container {
+    border-radius: 30px;
+    box-shadow: 0px 0px 35px var(--shadow);
+    background-color: var(--main-color);
+    padding: 50px;
+    min-height: 610px;
+    transition: background-color 0.3s;
+}
+
+.vish-cards-container {
+    gap: 39px;
+    margin-top: 50px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    width: 100%;
+}

@@ -1,0 +1,43 @@
+.itemButton {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    border: none;
+    background-color: var(--main-color);
+    cursor: pointer;
+    transition: scale 0.3s, background-color 0.3s;
+    text-decoration: none;
+}
+
+.itemButton .itemText {
+    margin: 0px 0px 0px 5px;
+    transition: color 0.3s;
+    font-weight: 300;
+    font-size: 18px;
+    font-family: 'Montserrat';
+    color: var(--text-color);
+}
+
+.itemButton:hover {
+    scale: 1.1;
+    transition: all 0.3s;
+    --primary-color: #025ADD;
+}
+
+.itemButton:hover .itemText {
+    color: #025ADD;
+}
+
+.count {
+    width: 23px;
+    height: 23px;
+    position: absolute;
+    background-color: #025ADD;
+    border-radius: 100px;
+    margin: 0px 0px 40px 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-family: 'Montserrat';
+}

@@ -1,0 +1,158 @@
+.sales-container {
+    box-shadow: 0px 0px 35px var(--shadow);
+    background-color: var(--main-color);
+    display: flex;
+    justify-content: space-between;
+    flex-direction: column;
+    height: 560px;
+    border-radius: 30px;
+    padding: 50px;
+    position: relative;
+    flex: 1;
+    overflow: hidden;
+    transition: background-color 0.3s;
+}
+
+.sale-items-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.sale-items.slide-left {
+    animation: slide-left 0.5s ease-in-out;
+}
+
+.sale-items.slide-right {
+    animation: slide-right 0.5s ease-in-out;
+}
+
+@keyframes slide-left {
+    0% { opacity: 0; transform: translateX(-100%); }
+    100% { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes slide-right {
+    0% { opacity: 0; transform: translateX(100%); }
+    100% { opacity: 1; transform: translateX(0); }
+}
+
+.arrow {
+    background-color: rgba(0, 0, 0, 0);
+    border: none;
+    cursor: pointer;
+    padding: 0px;
+    transition: scale 0.3s;
+    z-index: 1;
+}
+
+.arrow.left-arrow {
+    left: 5px;
+}
+
+.arrow.right-arrow {
+    right: 5px;
+}
+
+.arrow:hover {
+    scale: 1.1;
+    --primary-color: #025ADD;
+}
+
+.sale-items {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: fit-content;
+    width: 100%;
+}
+
+.cost-container {
+    display: flex;
+    align-items: flex-end;
+}
+
+.add-to-vish {
+    position: absolute;
+    bottom: 50px;
+    right: 50px;
+    width: 60px;
+    height: 60px;
+    padding: 0px;
+    background-color: rgba(0, 0, 0, 0);
+    border: none;
+    cursor: pointer;
+    transition: scale 0.3s;
+}
+
+.add-to-vish:hover {
+    scale: 1.1;
+    --primary-color: #025ADD;
+}
+
+.add-to-vish:hover .add-to-vish-hover {
+    opacity: 1;
+    scale: 1.1;
+}
+
+.item-text {
+    font-weight: 400;
+    font-size: 24px;
+    margin: 10px 0px;
+}
+
+.sales-container .item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 90%;
+}
+
+.sales-container .sale-image {
+    height: 240px;
+}
+
+.sales-img-container {
+    width: calc(100% - 40px);
+    background-color: white;
+    border-radius: 30px;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.cost {
+    font-size: 60px;
+    font-weight: 900;
+    color: var(--accent-color);
+    margin: 0px;
+    transition: font-size 0.3s ease;
+}
+
+.previous-cost {
+    font-size: 30px;
+    font-weight: 300;
+    color: var(--second-color);
+    margin: 10px 20px;
+    text-decoration: line-through;
+    transition: color 0.3s;
+}
+
+.sale-percent {
+    position: absolute;
+    width: 160px;
+    height: 160px;
+    top: 50px;
+    right: 50px;
+    background-color: #025ADD;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 100px;
+    color: var(--main-color);
+    font-size: 60px;
+    font-weight: 200;
+    transition: color 0.3s;
+}
