@@ -1,4 +1,4 @@
-.itemButton {
+.busketButton, .itemButton {
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -9,23 +9,14 @@
     text-decoration: none;
 }
 
-.itemButton .itemText {
-    margin: 0px 0px 0px 5px;
-    transition: color 0.3s;
-    font-weight: 300;
-    font-size: 18px;
-    font-family: 'Montserrat';
-    color: var(--text-color);
+.busketButton {
+    width: 46px;
 }
 
-.itemButton:hover {
+.busketButton:hover, .itemButton:hover {
     scale: 1.1;
     transition: all 0.3s;
     --primary-color: #025ADD;
-}
-
-.itemButton:hover .itemText {
-    color: #025ADD;
 }
 
 .count {

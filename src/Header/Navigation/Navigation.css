@@ -1,0 +1,49 @@
+.nav-items {
+    list-style-type: none;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    width: 98%;
+    padding: 10px 1%;
+    background-color: var(--second-accent-color);
+    border-radius: 30px;
+    font-weight: 300;
+    font-size: 18px;
+    margin: 0px 0px 39px 0px;
+    transition: background-color 0.3s;
+}
+
+.nav-container {
+    width: 76vw;
+    margin: 0px auto;
+}
+
+.nav-item {
+    cursor: pointer;
+    transition: color 0.3s, background-color 0.3s;
+    padding: 5px 12px;
+    margin: 5px 0px;
+    border-radius: 20px;
+}
+
+.nav-item:hover {
+    background-color: var(--accent-color);
+}
+
+.nav-item a {
+    transition: color 0.3s, background-color 0.3s;
+    color: var(--text-color);
+    text-decoration: none;
+}
+
+.nav-item:hover a {
+    color: var(--main-color);
+}
+
+.nav-item.active {
+    background-color: var(--accent-color);
+}
+
+.nav-item.active a {
+    color: var(--main-color);
+}

@@ -1,0 +1,13 @@
+.themeButton {
+    background-color: rgba(0, 0, 0, 0);
+    border: none;
+    width: 38px;
+    transition: scale 0.3s;
+    padding: 0px;
+    cursor: pointer;
+}
+
+.themeButton:hover {
+    --primary-color: var(--accent-color);
+    scale: 1.1;
+}

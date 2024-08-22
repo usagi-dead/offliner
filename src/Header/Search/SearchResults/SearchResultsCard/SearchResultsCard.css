@@ -1,0 +1,109 @@
+.search-result-item {
+    height: 190px;
+    display: flex;
+    align-items: center;
+    position: relative;
+    padding: 10px;
+    position: relative;
+    transition: background-color 0.3s;
+    border-radius: 30px;
+}
+
+.search-result-item:hover {
+    background-color: var(--second-accent-color);
+}
+
+.search-line {
+    position: absolute;
+    border-bottom: 1px solid var(--second-color);
+    width: calc(100% - 62px);
+    left: 31px;
+    bottom: 0px;
+}
+
+.search-result-item img {
+    width: fit-content;
+    height: 150px;
+}
+
+.search-img-container {
+    max-width: 340px;
+    background-color: white;
+    border-radius: 20px;
+    padding: 10px;
+    margin: 0px 0px 0px 10px;
+}
+
+.search-img-container {
+    min-width: 350px;
+    display: flex;
+    justify-content: center;
+}
+
+.search-result-item span.name {
+    top: 13px;
+    flex-grow: 1;
+    font-family: 'Montserrat';
+    font-weight: 300;
+    font-size: 24px;
+}
+
+.search-result-text {
+    color: var(--text-color);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    height: 100%;
+    transition: color 0.3s;
+}
+
+.search-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    margin: 0px 0px 0px 30px;
+}
+
+.search-price {
+    margin: 20px 0px 0px 0px;
+    font-family: 'Montserrat';
+    font-weight: 900;
+    font-size: 40px;
+    color: var(--text-color);
+    transition: color 0.3s;
+}
+
+.blue {
+    color: var(--accent-color);
+}
+
+.search-default-price {
+    margin: 0px 0px 0px 20px;
+    font-family: 'Montserrat';
+    font-weight: 300;
+    font-size: 20px;
+    color: var(--second-color);
+    text-decoration: line-through;
+}
+
+.search-container {
+    display: flex;
+}
+
+.search-discount {
+    position: absolute;
+    background-color: var(--accent-color);
+    height: 80px;
+    width: 80px;
+    border-radius: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    left: 10px;
+    top: 10px;
+    color: var(--main-color);
+    font-family: 'Montserrat';
+    font-weight: 300;
+    font-size: 20px;
+    transition: color 0.3s;
+}
