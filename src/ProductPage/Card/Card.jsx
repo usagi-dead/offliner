@@ -12,14 +12,17 @@ export default function Card({ name, imgUrl, specs, price, origPrice, discount, 
         setIsWished(wishList.some(item => item.name === name));
     }, [name]);
 
-    const handleWishToggle = () => {
+    const handleWishToggle = (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        
         if (isWished) {
             removeFromWishList(name);
         } else {
             addToWishList({ name, imgUrl, specs, price, origPrice, discount });
         }
         setIsWished(!isWished);
-    }
+    };
 
     Object.keys(specs).forEach((key) => {
         const [section, ...rest] = key.split(': ');
@@ -32,7 +35,7 @@ export default function Card({ name, imgUrl, specs, price, origPrice, discount, 
     const cardRef = useRef(null);
 
     return (
-        <Link className={classes.card} ref={cardRef} to={`/gpu/product/${productUrl}`}>
+        <div className={classes.card} ref={cardRef} onClick={() => window.location.href = `/gpu/product/${productUrl}`}>
             <div className={classes.cardImage} style={{ backgroundImage: `url(${imgUrl})` }}></div>
             <h1 className={classes.title}>{name}</h1>
 
@@ -78,6 +81,6 @@ export default function Card({ name, imgUrl, specs, price, origPrice, discount, 
                 </defs>
                 </svg>
             </button>
-        </Link>
+        </div>
     );
 }
