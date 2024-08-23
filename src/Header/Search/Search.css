@@ -12,10 +12,6 @@
     box-shadow: 0px 0px 10px var(--shadow);
 }
 
-.search-button:hover svg {
-    --second-color: #025ADD;
-}
-
 .overlay {
     position: fixed;
     top: 0;
