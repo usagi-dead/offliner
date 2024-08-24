@@ -18,12 +18,12 @@ header .container {
     width: 76vw;
     height: fit-content;
     display: flex;
-    margin: 39px 0px;
-    gap: 0px 39px;
+    margin: var(--gap) 0px;
+    gap: 0px var(--gap);
 }
 
 .buttons-container {
     display: flex;
     flex-direction: row;
-    gap: 0px 39px;
+    gap: 0px var(--gap);
 }

@@ -15,7 +15,7 @@
     background-color: var(--second-accent-color);
     border-radius: 24px;
     height: fit-content;
-    margin: 0px 0px 39px 0px;
+    margin: 0px 0px var(--gap) 0px;
     padding: 10px;
     transition: background-color 0.3s;
 }
@@ -25,7 +25,8 @@
     transition: color 0.3s, background-color 0.3s;
     padding: 5px 12px;
     margin: 0px;
-    border-radius: 30px;
+    border-radius: 50px;
+    user-select: none;
 }
 
 .nav-item:hover {

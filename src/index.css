@@ -1,4 +1,10 @@
 :root {
+    --container-padding: 46px;
+    --gap: 29px;
+    --border-radius: 30px;
+
+    --title-text: 52px;
+
     --background-color: #F5F5F5;
     --main-color: white;
     --text-color: black;
@@ -28,4 +34,11 @@ body {
     color: var(--text-color);
     transition: background-color 0.3s, color 0.3s;
     font-family: "Montserrat";
+}
+
+.title {
+    font-weight: 900;
+    font-size: 52px;
+    margin: 0px;
+    user-select: none;
 }

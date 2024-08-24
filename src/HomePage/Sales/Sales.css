@@ -4,9 +4,9 @@
     display: flex;
     justify-content: space-between;
     flex-direction: column;
-    height: 560px;
-    border-radius: 30px;
-    padding: 50px;
+    height: 460px;
+    border-radius: var(--border-radius);
+    padding: var(--container-padding);
     position: relative;
     flex: 1;
     overflow: hidden;
@@ -98,7 +98,7 @@
 
 .item-text {
     font-weight: 400;
-    font-size: 24px;
+    font-size: 20px;
     margin: 10px 0px;
 }
 
@@ -110,13 +110,13 @@
 }
 
 .sales-container .sale-image {
-    height: 240px;
+    height: 200px;
 }
 
 .sales-img-container {
     width: calc(100% - 40px);
     background-color: white;
-    border-radius: 30px;
+    border-radius: var(--border-radius);
     padding: 20px;
     display: flex;
     justify-content: center;
@@ -124,7 +124,7 @@
 }
 
 .cost {
-    font-size: 60px;
+    font-size: 50px;
     font-weight: 900;
     color: var(--accent-color);
     margin: 0px;
@@ -132,18 +132,18 @@
 }
 
 .previous-cost {
-    font-size: 30px;
+    font-size: 24px;
     font-weight: 300;
     color: var(--second-color);
-    margin: 5px 20px;
+    margin: 6px 20px;
     text-decoration: line-through;
     transition: color 0.3s;
 }
 
 .sale-percent {
     position: absolute;
-    width: 160px;
-    height: 160px;
+    width: 130px;
+    height: 130px;
     top: 50px;
     right: 50px;
     background-color: #025ADD;
@@ -152,7 +152,8 @@
     align-items: center;
     border-radius: 100px;
     color: var(--main-color);
-    font-size: 60px;
+    font-size: 46px;
     font-weight: 200;
     transition: color 0.3s;
+    user-select: none;
 }

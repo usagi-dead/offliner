@@ -1,7 +1,6 @@
 import React, { useRef, useState, useEffect } from 'react';
 import classes from './Card.module.css';
-import { addToWishList, removeFromWishList, getWishList } from '../../VishUtils';
-import { Link } from 'react-router-dom';
+import { addToWishList, removeFromWishList, getWishList } from '../VishUtils';
 
 export default function Card({ name, imgUrl, specs, price, origPrice, discount, productUrl }) {
     const sections = {};

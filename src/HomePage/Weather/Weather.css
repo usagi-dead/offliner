@@ -2,21 +2,14 @@
     box-shadow: 0px 0px 35px var(--shadow);
     background-color: var(--main-color);
     display: flex;
-    margin: 0px 39px 0px 0px;
     justify-content: space-between;
     flex-direction: column;
-    height: 560px;
-    border-radius: 30px;
-    padding: 50px;
+    height: 460px;
+    border-radius: var(--border-radius);
+    padding: var(--container-padding);
     position: relative;
     flex: 1;
     transition: background-color 0.3s;
-}
-
-.title {
-    font-weight: 900;
-    font-size: 60px;
-    margin: 0px;
 }
 
 .weather-data {
@@ -27,19 +20,26 @@
     font-weight: 200;
     font-size: 30px;
     margin: 0px;
+    user-select: none;
 }
 
 .weather-data .degrees {
     font-weight: 100;
     font-size: 120px;
     margin: 0px;
+    height: 110px;
+    align-items: center;
+    display: flex;
+    justify-content: left;
+    user-select: none;
 }
 
 .weather-data .weather-type {
     font-weight: 300;
     font-size: 30px;
     margin: 0px;
-    max-width: 250px;
+    max-width: 290px;
+    user-select: none;
 }
 
 .quote {
@@ -49,10 +49,10 @@
 
 .quote .circle {
     background-color: #025ADD;
-    min-width: 50px;
-    width: 50px;
-    height: 50px;
-    border-radius: 30px;
+    min-width: 40px;
+    width: 40px;
+    height: 40px;
+    border-radius: var(--border-radius);
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -61,10 +61,11 @@
 
 .quote .hooks {
     color: var(--main-color);
-    font-size: 50px;
+    font-size: 40px;
     margin: 0px;
-    height: 42px;
+    height: 36px;
     transition: color 0.3s;
+    user-select: none;
 }
 
 .quote .line {
@@ -79,13 +80,15 @@
     margin: 0px 10% 0px 0px;
     width: 75%;
     font-weight: 300;
-    font-size: 30px;
+    font-size: 26px;
     font-style: italic;
 }
 
 .weather-img {
     position: absolute;
     right: 80px;
-    top: 50%;
+    top: 48%;
     transform: translate(0%, -50%);
+    height: 260px;
+    user-select: none;
 }

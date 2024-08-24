@@ -5,9 +5,9 @@ const API_KEY_WEATHER = 'd8da04f2fbeae7b5378ae6e65264ae5b';
 
 const weatherImages = {
     '01d': 'clear_day.svg',
-    '01n': 'clear_night.svg',
+    '01n': 'clear_day.svg',
     '02d': 'few_clouds_day.svg',
-    '02n': 'few_clouds_night.svg',
+    '02n': 'few_clouds_day.svg',
     '03d': 'clouds.svg',
     '03n': 'clouds.svg',
     '04d': 'clouds.svg',
@@ -89,8 +89,14 @@ export default function Weather() {
         return description.charAt(0).toUpperCase() + description.slice(1);
     };
 
+    const formatDay = () => {
+        const options = { weekday: 'long' };
+        const day = new Date().toLocaleDateString('ru-RU', options);
+        return day.charAt(0).toUpperCase() + day.slice(1);
+    };
+    
     const formatDate = () => {
-        const options = { weekday: 'long', day: 'numeric', month: 'long' };
+        const options = { day: 'numeric', month: 'long' };
         return new Date().toLocaleDateString('ru-RU', options);
     };
 
@@ -107,6 +113,7 @@ export default function Weather() {
         <section className="weather-container">
             <h1 className="title">Погода сейчас</h1>
             <div className="weather-data">
+                <h3 className="date">{formatDay()}</h3>
                 <h3 className="date">{formatDate()}</h3>
                 <h1 className="degrees">{Math.round(weatherData.main.temp)}°</h1>
                 <h3 className="weather-type">{formatDescription(weatherData.weather[0].description)}</h3>

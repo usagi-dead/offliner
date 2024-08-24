@@ -18,7 +18,7 @@ footer .container {
     margin: auto;
     justify-content: space-between;
     align-items: center;
-    padding: 39px 0px;
+    padding: var(--gap) 0px;
 }
 
 .registered-mark {
@@ -27,6 +27,7 @@ footer .container {
     font-size: 18px;
     opacity: 0.5;
     margin: 5px 0px 0px 0px;
+    user-select: none;
 }
 
 .contacts-container {
@@ -39,6 +40,7 @@ footer .container {
     font-weight: 700;
     font-size: 24px;
     margin: 0px 0px 7px 0px;
+    user-select: none;
 }
 
 .contacts-container h4 {
@@ -63,12 +65,13 @@ footer .container {
 .social-media-container {
     display: flex;
     justify-content: space-between;
-    width: 260px;
+    width: 240px;
 }
 
 .social-media {
     cursor: pointer;
     opacity: 0.5;
+    scale: 1;
     transition: opacity 0.3s, scale 0.3s;
 }
 

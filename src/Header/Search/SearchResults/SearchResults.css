@@ -7,7 +7,7 @@
     z-index: 2;
     border-top: none;
     padding: 0px 2vw;
-    border-radius: 0px 0px 30px 30px;
+    border-radius: 0px 0px var(--border-radius) var(--border-radius);
     transition: background-color 0.3s, border-color 0.3s, box-shadow 0.3s;
 }
 
@@ -27,7 +27,7 @@
 .title-search-container {
     border: 1px solid var(--second-color);
     background-color: var(--main-color);
-    border-radius: 30px 30px 0px 0px;
+    border-radius: var(--border-radius) var(--border-radius) 0px 0px;
     padding: 25px 30px;
     width: calc(76vw - 60px);
     height: fit-content;

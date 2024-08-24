@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import "./VishPage.css";
-import Card from '../ProductPage/Card/Card';
+import Card from '../Card/Card';
 import { getWishList } from '../VishUtils';
 
 export default function VishPage() {

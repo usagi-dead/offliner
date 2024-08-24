@@ -30,7 +30,7 @@ export default function Card({ title, cardImage, urlProduct }) {
                 onMouseLeave={handleMouseLeave}
                 ref={cardRef}
             >
-                <img src={cardImage} alt={cardImage} />
+                <img src={cardImage} alt={cardImage} className={classes.cardImage} />
                 <h2>{title}</h2>
             </button>
         </Link>
