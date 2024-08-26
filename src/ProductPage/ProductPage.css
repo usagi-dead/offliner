@@ -16,7 +16,7 @@
 .products-cards-container {
     margin-left: 400px;
     gap: var(--gap);
-    margin-top: 50px;
+    margin-top: var(--gap);
     display: flex;
     flex-wrap: wrap;
     justify-content: center;

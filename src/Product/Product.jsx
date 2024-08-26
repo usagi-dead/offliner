@@ -2,6 +2,9 @@ import React from 'react';
 import "./Product.css";
 import { useParams } from 'react-router-dom';
 import gpu from '../gpu';
+import Specs from "../Card/Specs/Specs";
+import ToVish from "../Items/ToVish/ToVish";
+import ToBusket from "../Items/ToBusket/ToBusket";
 
 export default function ProductPage() {
     const { productID } = useParams();
@@ -11,7 +14,6 @@ export default function ProductPage() {
         return <div>Товар не найден</div>;
     }
 
-    // Группировка характеристик по категориям
     const groupedSpecs = Object.entries(product.specs).reduce((acc, [key, value]) => {
         const [category, spec] = key.split(':').map(part => part.trim());
         if (!acc[category]) {
@@ -29,13 +31,26 @@ export default function ProductPage() {
                     <div className='product-image-container'>
                         <img src={product.imageURL} alt={product.name} className='product-image' />
                     </div>
-                    <div className="product-prices">
-                        {product.currentPrice && <h2 className='price'>{product.currentPrice}</h2>}
-                        {product.originalPrice && <h3 className='original-price'>{product.originalPrice}</h3>}
-                        {product.discount && <h4 className='discount'>{product.discount}</h4>}
+                    <div className='product-text-container'>
+                        <Specs specs={product.specs} />
+
+                        <div className="product-prices">
+                            {product.currentPrice && <h2 className={product.originalPrice ? "price blue" : "price"}>{product.currentPrice}</h2>}
+                            {product.originalPrice && 
+                            <h3 className='original-price'>
+                                {product.originalPrice}
+                                {product.discount && <h4 className='discount'>{product.discount}</h4>}
+                            </h3>}
+                        </div>
+
+                        <div className='product-buttons-container'>
+                            <ToBusket />
+                            <ToVish vishItem={product} />
+                        </div>
                     </div>
                 </div>
                 <div className="product-specs">
+                    <h1 className='title'>Характеристики</h1>
                     {Object.entries(groupedSpecs).map(([category, specs]) => (
                         <div key={category}>
                             <h2 className="specs-category">{category}</h2>
