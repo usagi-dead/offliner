@@ -37,16 +37,18 @@ export default function ProductPage({ url, category }) {
             <div className='products-container'>
                 <h1 className='title'>{category}</h1>
                 <div className='products-cards-container'>
-                    {currentItems.map((card, index) => (
+                    {currentItems.map((item, index) => (
                         <Card 
                             key={index} 
-                            name={card.name} 
-                            imgUrl={card.imageURL} 
-                            specs={card.specs} 
-                            price={card.currentPrice}
-                            origPrice={card.originalPrice}
-                            discount={card.discount}
-                            productUrl={index}
+                            product={{
+                                name: item.name, 
+                                imgUrl: item.imageURL, 
+                                specs: item.specs, 
+                                price: item.currentPrice,
+                                origPrice: item.originalPrice,
+                                discount: item.discount,
+                                productUrl: index + (ITEMS_PER_PAGE * (page - 1))
+                            }} 
                         />
                     ))}
                 </div>

@@ -63,7 +63,7 @@
     color: var(--main-color);
     font-size: 40px;
     margin: 0px;
-    height: 36px;
+    height: 34px;
     transition: color 0.3s;
     user-select: none;
 }
@@ -86,9 +86,9 @@
 
 .weather-img {
     position: absolute;
-    right: 80px;
-    top: 48%;
+    right: var(--container-padding);
+    top: 44%;
     transform: translate(0%, -50%);
-    height: 260px;
+    scale: 0.86;
     user-select: none;
 }

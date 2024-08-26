@@ -73,29 +73,6 @@
     align-items: flex-end;
 }
 
-.add-to-vish {
-    position: absolute;
-    bottom: 50px;
-    right: 50px;
-    width: 60px;
-    height: 60px;
-    padding: 0px;
-    background-color: rgba(0, 0, 0, 0);
-    border: none;
-    cursor: pointer;
-    transition: scale 0.3s;
-}
-
-.add-to-vish:hover {
-    scale: 1.1;
-    --primary-color: #025ADD;
-}
-
-.add-to-vish:hover .add-to-vish-hover {
-    opacity: 1;
-    scale: 1.1;
-}
-
 .item-text {
     font-weight: 400;
     font-size: 20px;
@@ -156,4 +133,10 @@
     font-weight: 200;
     transition: color 0.3s;
     user-select: none;
+}
+
+.sale-bot-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: self-end;
 }

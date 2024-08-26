@@ -11,6 +11,16 @@ export default function ProductPage() {
         return <div>Товар не найден</div>;
     }
 
+    // Группировка характеристик по категориям
+    const groupedSpecs = Object.entries(product.specs).reduce((acc, [key, value]) => {
+        const [category, spec] = key.split(':').map(part => part.trim());
+        if (!acc[category]) {
+            acc[category] = [];
+        }
+        acc[category].push({ spec, value });
+        return acc;
+    }, {});
+
     return (
         <div className="product-page">
             <div className='product-container'>
@@ -26,9 +36,18 @@ export default function ProductPage() {
                     </div>
                 </div>
                 <div className="product-specs">
-                    {Object.entries(product.specs).map(([key, value]) => (
-                        <div key={key}>
-                            <strong>{key}:</strong> {value}
+                    {Object.entries(groupedSpecs).map(([category, specs]) => (
+                        <div key={category}>
+                            <h2 className="specs-category">{category}</h2>
+                            {specs.map((spec, index) => (
+                                <div
+                                    key={spec.spec}
+                                    className={`spec-container ${index === specs.length - 1 ? 'last-spec' : ''}`}
+                                >
+                                    <div className='spec-name'>{spec.spec}:</div>
+                                    <div className='spec-value'>{spec.value}</div>
+                                </div>
+                            ))}
                         </div>
                     ))}
                 </div>

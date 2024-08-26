@@ -1,0 +1,14 @@
+.add-to-vish {
+    padding: 0px;
+    background-color: rgba(0, 0, 0, 0);
+    border: none;
+    cursor: pointer;
+    transition: scale 0.3s;
+    height: 50px;
+    width: 50px;
+}
+
+.add-to-vish:hover {
+    scale: 1.1;
+    --primary-color: #025ADD;
+}

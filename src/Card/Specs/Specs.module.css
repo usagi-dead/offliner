@@ -1,0 +1,8 @@
+.specList {
+    padding-left: 20px;
+    margin: 10px 0px;
+    height: 70px;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+}

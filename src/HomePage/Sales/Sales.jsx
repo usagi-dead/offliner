@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import "./Sales.css";
 import gpu from '../../gpu';
-import { addToWishList, removeFromWishList, getWishList } from '../../VishUtils';
-import svgIcons from "../../svgIcons"
+import svgIcons from "../../svgIcons";
+import ToVish from "../../Items/ToVish/ToVish";
 
 export default function Sales() {
     const discountedItems = gpu.filter(item => item.discount !== null);
@@ -29,28 +29,6 @@ export default function Sales() {
     };
 
     const currentSaleItem = discountedItems[currentIndex];
-    let name = currentSaleItem.name;
-    let imgUrl = currentSaleItem.imageURL;
-    let specs = currentSaleItem.specs;
-    let price = currentSaleItem.currentPrice;
-    let origPrice = currentSaleItem.originalPrice;
-    let discount = currentSaleItem.discount;
-
-    const [isWished, setIsWished] = useState(false);
-
-    useEffect(() => {
-        const wishList = getWishList();
-        setIsWished(wishList.some(item => item.name === name));
-    }, [name]);
-
-    const handleWishToggle = () => {
-        if (isWished) {
-            removeFromWishList(name);
-        } else {
-            addToWishList({ name, imgUrl, specs, price, origPrice, discount });
-        }
-        setIsWished(!isWished);
-    }
 
     return (
         <section className="sales-container">
@@ -75,14 +53,14 @@ export default function Sales() {
                 </button>
             </div>
 
-            <div className="cost-container">
-                <h2 className="cost">{currentSaleItem.currentPrice}</h2>
-                <h4 className="previous-cost">{currentSaleItem.originalPrice || '—'}</h4>
-            </div>
+            <div className='sale-bot-container'>
+                <div className="cost-container">
+                    <h2 className="cost">{currentSaleItem.currentPrice}</h2>
+                    <h4 className="previous-cost">{currentSaleItem.originalPrice || '—'}</h4>
+                </div>
 
-            <button className="add-to-vish" onClick={handleWishToggle}>
-                {isWished ? svgIcons["addToWish"] : svgIcons["addToWishFilled"]}
-            </button>
+                <ToVish vishItem={currentSaleItem} />
+            </div>
 
             <div className="sale-percent">{currentSaleItem.discount}</div>
         </section>

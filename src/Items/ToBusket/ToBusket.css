@@ -1,0 +1,17 @@
+.add-to-busket {
+    background-color: var(--accent-color);
+    color: var(--main-color);
+    font-family: 'Montserrat';
+    font-size: 18px;
+    font-weight: 400;
+    border: none;
+    border-radius: 30px;
+    height: fit-content;
+    padding: 10px 24px;
+    cursor: pointer;
+    transition: scale 0.3s;
+}
+
+.add-to-busket:hover {
+    scale: 1.1;
+}

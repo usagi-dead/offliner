@@ -7,6 +7,7 @@
     font-size: 14px;
     padding: 0px;
     margin: 0px;
+    gap: 10px;
 }
 
 .nav-container {
@@ -27,6 +28,9 @@
     margin: 0px;
     border-radius: 50px;
     user-select: none;
+    min-width: fit-content;
+    flex: 1;
+    text-align: center;
 }
 
 .nav-item:hover {
@@ -37,6 +41,7 @@
     transition: color 0.3s, background-color 0.3s;
     color: var(--text-color);
     text-decoration: none;
+    font-weight: 400;
 }
 
 .nav-item:hover a {

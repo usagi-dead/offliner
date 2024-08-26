@@ -21,15 +21,18 @@ export default function VishPage() {
             <div className='vish-container'>
                 <h1 className='title'>Желаемое</h1>
                 <div className='vish-cards-container'>
-                    {items.map((card, index) => (
+                    {items.map((item, index) => (
                         <Card 
                             key={index} 
-                            name={card.name} 
-                            imgUrl={card.imgUrl} 
-                            specs={card.specs} 
-                            price={card.price}  
-                            origPrice={card.origPrice} 
-                            discount={card.discount}
+                            product={{
+                                name: item.name, 
+                                imgUrl: item.imgUrl, 
+                                specs: item.specs, 
+                                price: item.price,
+                                origPrice: item.origPrice,
+                                discount: item.discount,
+                                productUrl: index
+                            }} 
                         />
                     ))}
                 </div>

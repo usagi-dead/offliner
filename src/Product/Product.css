@@ -1,6 +1,6 @@
 .product-page {
     width: 76vw;
-    margin: 39px auto;
+    margin: var(--gap) auto;
     height: fit-content;
 }
 
@@ -70,4 +70,30 @@
     text-decoration: line-through;
     color: var(--second-color);
     font-weight: 300;
+}
+
+.specs-category {
+    margin: 30px 0px 20px 0px;
+}
+
+.spec-container {
+    display: flex;
+    margin: 20px 0px;
+}
+
+.spec-value, .spec-name {
+    font-size: 18px;
+}
+
+.spec-value {
+    font-weight: 400;
+}
+
+.spec-name {
+    font-weight: 300;
+    width: 600px;
+}
+
+.last-spec {
+    margin-bottom: 0px;
 }

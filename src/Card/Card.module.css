@@ -3,32 +3,26 @@
     border-radius: var(--border-radius);
     cursor: pointer;
     border: 1px solid var(--second-color);
-    padding: 20px;
-    height: 420px;
-    text-align: left;
+    padding: var(--gap);
+    height: 210px;
     display: flex;
-    flex-direction: column;
     position: relative;
-    flex: 1;
     transition: scale 0.3s, box-shadow 0.3s, background-color 0.3s, border 0.3s;
     text-decoration: none;
+    width: 100%;
 }
 
-.title {
-    font-family: 'Montserrat';
-    font-weight: 500;
-    font-size: 16px;
-    margin: 0px;
-    color: var(--text-color);
-    transition: color 0.3s;
-    width: 90%;
+.card:hover {
+    scale: 1.03;
+    z-index: 2;
+    box-shadow: 0px 0px 35px rgba(2, 90, 221, 0.2);
+    border: 1px solid #025ADD;
 }
 
 .cardImage {
     min-width: 240px;
-    width: 100%;
-    height: 220px;
-    margin: 0px auto 20px auto;
+    width: fit-content;
+    height: 100%;
     background-repeat: no-repeat;
     background-position: 50% 50%;
     background-size: 185px auto;
@@ -36,46 +30,61 @@
     border-radius: 9px;
 }
 
-.card:hover {
-    scale: 1.06;
-    z-index: 2;
-    box-shadow: 0px 0px 35px rgba(2, 90, 221, 0.2);
-    border: 1px solid #025ADD;
+.contentContainer {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    flex: 1;
+    margin: 0px 0px 0px var(--gap);
 }
 
-.priceContainer {
+.bottomContainer, .priceContainer {
+    height: fit-content;
     display: flex;
-    align-items: last baseline;
-    width: calc(100% + 20px);
+    align-items: flex-end;
+}
+
+.bottomContainer {
+    justify-content: space-between;
+}
+
+.notInStock, .defaultPrice, .price, .title {
+    margin: 0px;
+    height: fit-content;
 }
 
 .price {
-    font-family: 'Montserrat';
+    font-size: 38px;
     font-weight: 900;
-    font-size: 26px;
-    margin: 0px 0px 10px 0px;
-    color: var(--text-color);
-    transition: color 0.3s;
-    width: fit-content;
-}
-
-.blue {
-    color: #025ADD;
 }
 
 .defaultPrice {
-    font-family: 'Montserrat';
+    font-size: 20px;
     font-weight: 300;
-    font-size: 14px;
     color: var(--second-color);
+    margin: 6px 8px;
     text-decoration: line-through;
-    margin: 0px 0px 0px 6px;
     transition: color 0.3s;
+}
+
+.priceContainer {
+    height: fit-content;
+}
+
+.buttons {
+    width: fit-content;
+    display: flex;
+    align-items: center;
+    gap: var(--gap);
+}
+
+.blue {
+    color: var(--accent-color);
 }
 
 .discount {
     position: absolute;
-    right: 16px;
+    left: 16px;
     top: 16px;
     font-family: 'Montserrat';
     font-weight: 300;
@@ -88,65 +97,29 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    transition: rotate 0.6s, height 0.3s, width 0.3s, top 0.3s, right 0.3s, font-size 0.5s;
+    transition: rotate 0.6s, height 0.3s, width 0.3s, top 0.3s, left 0.3s, font-size 0.5s;
 }
 
 .card:hover .discount {
     top: 6px;
-    right: 6px;
+    left: 6px;
     rotate: -30deg;
     height: 90px;
     width: 90px;
     font-size: 24px;
 }
 
+.title {
+    font-weight: 700;
+    font-size: 22px;
+    color: var(--text-color);
+    transition: color 0.3s;
+}
+
 .notInStock {
-    font-family: 'Montserrat';
     font-weight: 300;
     font-size: 20px;
     color: var(--second-color);
-    margin: 20px 30px;
+    margin: auto 5px;
     width: fit-content;
-}
-
-.bottomContainer {
-    position: absolute;
-    bottom: 20px;
-    width: 90%;
-}
-
-.toBusketButton {
-    background-color: #025ADD;
-    color: white;
-    padding: 12px 26px;
-    border-radius: var(--border-radius);
-    font-family: 'Montserrat';
-    font-size: 18px;
-    font-weight: 500;
-    border: none;
-    cursor: pointer;
-    transition: scale 0.3s, box-shadow 0.3s;
-}
-
-.toBusketButton:hover {
-    scale: 1.1;
-    box-shadow: 0px 0px 35px rgba(2, 90, 221, 0.2);
-}
-
-.addToVish {
-    position: absolute;
-    bottom: 20px;
-    right: 20px;
-    width: 50px;
-    height: 50px;
-    padding: 0px;
-    background-color: rgba(0, 0, 0, 0);
-    transition: scale 0.3s;
-    border: none;
-    cursor: pointer;
-}
-
-.addToVish:hover {
-    scale: 1.1;
-    --primary-color: #025ADD;
 }
