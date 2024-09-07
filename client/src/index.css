@@ -17,14 +17,14 @@
 }
 
 [data-theme="black"] {
-    --background-color: #000000;
+    --background-color: #0c0c0c;
     --main-color: #1b1b1b;
     --text-color: white;
     --second-color: #424242;
     --accent-color: #025ADD;
     --second-accent-color: #303037;
-    --shadow: rgba(150, 150, 150, 0.2);
-    --extra-shadow: rgba(150, 150, 150, 0.3);
+    --shadow: rgba(0, 0, 0, 0.9);
+    --extra-shadow: rgba(0, 0, 0, 1);
     --primary-color: white;
 }
 
