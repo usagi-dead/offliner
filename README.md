@@ -1,12 +1,18 @@
 # offliner
 ![GitHub Logo](https://github.com/user-attachments/assets/2bae7676-c569-4927-bd99-73fd94db514c)
 
-
 It's not a commercial project.
 
-**Offliner** is an online catalog of PC components. Developed in **ReactJS** with future implementation of **NestJS** for backend. 
+#### Stack:
 
-The project is at an early stage of development and is needed to learn ReactJS. 
+- [ReactJS](https://react.dev/)
+- [Vite](https://vitejs.dev/)
+- [CSS](https://redis.io/)
+- [Go](https://go.dev/)
+
+**Offliner** is an online catalog of PC components. Developed in **ReactJS** with future implementation of **Go** for backend. 
+
+The project is at an early stage of development and is needed to learn **ReactJS**. 
 
 **Implemented pages:**
 - Home, containing:
