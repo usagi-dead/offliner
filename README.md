@@ -7,7 +7,7 @@ It's not a commercial project.
 
 - [ReactJS](https://react.dev/)
 - [Vite](https://vitejs.dev/)
-- [CSS]
+- CSS
 
 **Offliner** is an online catalog of PC components. Developed in **ReactJS** with future implementation of **Go** for backend. 
 
