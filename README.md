@@ -1,5 +1,6 @@
 # offliner
-![Logo Black Theme](https://github.com/user-attachments/assets/ffa2b7b8-01d4-4ecb-8cf9-cea737081198)
+![GitHub Logo](https://github.com/user-attachments/assets/45af44b3-6f81-4f0e-b094-f29e23782072)
+
 
 It's not a commercial project.
 
