@@ -1,5 +1,5 @@
 # offliner
-![GitHub Logo](https://github.com/user-attachments/assets/45af44b3-6f81-4f0e-b094-f29e23782072)
+![GitHub Logo](https://github.com/user-attachments/assets/2bae7676-c569-4927-bd99-73fd94db514c)
 
 
 It's not a commercial project.
