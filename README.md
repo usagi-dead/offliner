@@ -13,7 +13,7 @@ It's not a commercial project.
 
 The project is at an early stage of development and is needed to learn **ReactJS**. 
 
-**Implemented pages:**
+#### Implemented pages:
 - Home, containing:
   - Header with navigation
   - Weather information
@@ -34,3 +34,27 @@ The project is at an early stage of development and is needed to learn **ReactJS
 - Product Search
 
 It is planned to create a database to store information about products and users for their registration, create a profile, add the remaining product categories and filter them, create a shopping cart with order processing.
+
+## Local Developing
+
+1. Go to the client folder:
+   ```bash
+   cd clinet
+   ```
+   
+2. Download all the necessary packages:
+   ```bash
+   npm install
+   ```
+   
+3. Fix the problems:
+   ```bash
+   npm audit fix
+   ```
+   
+4. Start the local server:
+   ```bash
+   npm run dev
+   ```
+
+5. To open website click Ctrl+LKM on link
