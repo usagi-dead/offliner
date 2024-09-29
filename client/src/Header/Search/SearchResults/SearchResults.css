@@ -43,7 +43,7 @@
     flex-direction: column;
     position: absolute;
     left: 12vw;
-    top: 130px;
+    top: calc(var(--gap) * 2 + 48px);
 }
 
 .close-button-search {

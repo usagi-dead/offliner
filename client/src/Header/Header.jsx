@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import "./Header.css";
 import HeaderButton from './HeaderButton/HeaderButton';
 import Search from './Search/Search';
@@ -7,10 +7,25 @@ import { Link } from 'react-router-dom';
 import svgIcons from '../svgIcons';
 
 export default function Header() {
+    const [isScrolled, setIsScrolled] = useState(false);
+
+    useEffect(() => {
+        const handleScroll = () => {
+            const scrollTop = window.scrollY;
+            setIsScrolled(scrollTop > 0); 
+        };
+
+        window.addEventListener("scroll", handleScroll);
+
+        return () => {
+        window.removeEventListener("scroll", handleScroll);
+        };
+    }, []);
+
     return (
         <header>
-            <div className="container">
-                <Link to={`/`}>
+            <div className={isScrolled ? "container scrolled" : "container"}>
+                <Link to={`/`} className='logo'>
                     {svgIcons["logo"]}
                 </Link>
 

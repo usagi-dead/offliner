@@ -91,8 +91,8 @@ const svgIcons = {
     search:
     (
         <svg width="25" height="27" viewBox="0 0 31 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="11.8095" cy="11.8095" r="10.8095" stroke="var(--second-color)" stroke-width="2" style={{transition: 'stroke 0.3s'}}/>
-        <path d="M28.8167 31.7071C29.2072 32.0976 29.8404 32.0976 30.2309 31.7071C30.6215 31.3166 30.6215 30.6834 30.2309 30.2929L28.8167 31.7071ZM17.7453 20.6357L28.8167 31.7071L30.2309 30.2929L19.1595 19.2215L17.7453 20.6357Z" fill="var(--second-color)" style={{transition: 'fill 0.3s'}}/>
+        <circle cx="11.8095" cy="11.8095" r="10.8095" stroke="var(--text-color)" stroke-width="2" style={{transition: 'stroke 0.3s'}}/>
+        <path d="M28.8167 31.7071C29.2072 32.0976 29.8404 32.0976 30.2309 31.7071C30.6215 31.3166 30.6215 30.6834 30.2309 30.2929L28.8167 31.7071ZM17.7453 20.6357L28.8167 31.7071L30.2309 30.2929L19.1595 19.2215L17.7453 20.6357Z" fill="var(--text-color)" style={{transition: 'fill 0.3s'}}/>
         </svg>
     ),
     close: 

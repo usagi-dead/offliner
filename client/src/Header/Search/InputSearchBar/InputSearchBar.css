@@ -6,7 +6,7 @@
     height: 26px;
     display: flex;
     align-items: center;
-    font-weight: 300;
+    font-weight: 400;
     padding: 10px 20px;
     font-size: 16px;
     color: var(--second-color);
@@ -16,6 +16,11 @@
 }
 
 .search-bar:focus {
-    outline: none;
     color: var(--text-color);
+    outline: none;
+}
+
+.search:hover .search-bar {
+    color: var(--text-color);
+    border: 1px solid var(--text-color);
 }

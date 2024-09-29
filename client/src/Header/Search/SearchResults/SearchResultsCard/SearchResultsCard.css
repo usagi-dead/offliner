@@ -2,11 +2,14 @@
     height: fit-content;
     display: flex;
     align-items: center;
-    position: relative;
     padding: 20px;
-    position: relative;
     transition: background-color 0.3s;
     border-radius: var(--border-radius);
+    margin: 0px 0px 1px 0px;
+}
+
+.relative {
+    position: relative;
 }
 
 .search-result-item:hover {
@@ -18,7 +21,7 @@
     border-bottom: 1px solid var(--second-color);
     width: calc(100% - 62px);
     left: 31px;
-    bottom: 0px;
+    bottom: -1px;
 }
 
 .search-result-item img {

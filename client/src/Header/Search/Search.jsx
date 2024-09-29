@@ -46,10 +46,11 @@ export default function Search() {
                     onKeyDown={handleKeyDown} 
                 />
                 <SearchButton onClick={handleSearch} />
-                {searchResults.length > 0 && (
-                    <SearchResults results={searchResults} onClose={handleSearchClose} />
-                )}
             </div>
+
+            {searchResults.length > 0 && (
+                <SearchResults results={searchResults} onClose={handleSearchClose} />
+            )}
 
             {searchResults.length > 0 && (
                 <div className="overlay"></div>
