@@ -1,11 +1,14 @@
 # Offliner
-![GitHub Logo](https://github.com/user-attachments/assets/2bae7676-c569-4927-bd99-73fd94db514c)
+
+![GitHub Logo](https://github.com/user-attachments/assets/e793e28a-3351-4605-9a29-47e11d726b4b)
 
 It's not a commercial project.
 
 Frontend is made by [usagi.](https://github.com/usagi-dead)
 
 Backend is made by [shailuishai](https://github.com/shailuishai)
+
+##
 
 #### Stack:
 
