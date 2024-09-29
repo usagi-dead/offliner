@@ -3,6 +3,10 @@
 
 It's not a commercial project.
 
+Frontend is made by [usagi.](https://github.com/usagi-dead)
+
+Backend is made by [shailuishai](https://github.com/shailuishai)
+
 #### Stack:
 
 - [ReactJS](https://react.dev/)
