@@ -10,7 +10,7 @@ Backend is made by [shailuishai](https://github.com/shailuishai)
 #### Stack:
 
 - [ReactJS](https://react.dev/)
-- [Vite](https://vitejs.dev/)
+- [ViteJS](https://vitejs.dev/)
 - CSS
 
 **Offliner** is an online catalog of PC components. Developed in **ReactJS** with future implementation of **Go** for backend. 
