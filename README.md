@@ -64,4 +64,4 @@ It is planned to create a database to store information about products and users
    npm run dev
    ```
 
-5. To open website click Ctrl+LKM on link
+5. To open website click Ctrl+LMB on link
