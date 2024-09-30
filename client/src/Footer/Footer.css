@@ -1,5 +1,5 @@
 footer {
-    width: 100vw;
+    width: 100%;
     box-shadow: 0px 0px 35px var(--shadow);
     background-color: var(--main-color);
     height: fit-content;
