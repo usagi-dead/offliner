@@ -3,7 +3,7 @@
     flex-direction: row;
     align-items: center;
     border: none;
-    background-color: var(--main-color);
+    background-color: rgba(0, 0, 0, 0);
     cursor: pointer;
     transition: scale 0.5s, background-color 0.3s;
     text-decoration: none;

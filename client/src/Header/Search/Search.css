@@ -6,6 +6,7 @@
     z-index: 2;
     min-width: 200px;
     height: fit-content;
+    transition: box-shadow 0.3s ease-in-out;
 }
 
 .overlay {
