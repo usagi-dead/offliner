@@ -9,7 +9,7 @@
     height: fit-content;
     padding: 10px 24px;
     cursor: pointer;
-    transition: scale 0.3s;
+    transition: scale 0.3s, color 0.3s;
 }
 
 .add-to-busket:hover {
