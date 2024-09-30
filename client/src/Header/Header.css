@@ -23,7 +23,7 @@ header .container {
     gap: 0px var(--gap);
     background: var(--main-color);
     transition: background-color 0.3s, box-shadow 0.3s ease-in-out;
-    z-index: 3;
+    z-index: 5;
 }
 
 .buttons-container {
