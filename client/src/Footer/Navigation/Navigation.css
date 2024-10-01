@@ -7,9 +7,13 @@
     border-radius: var(--border-radius);
     height: fit-content;
     padding: 9px;
-    transition: background-color 0.3s;
+    transition: background-color 0.3s, border 0.3s;
     border: 1px solid var(--second-color);
     gap: 10px;
+}
+
+.footer-content-container:hover {
+    border: 1px solid var(--text-color);
 }
 
 .footer-text {
