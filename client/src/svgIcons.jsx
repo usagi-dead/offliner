@@ -4,11 +4,18 @@ const svgIcons = {
     profile:
     (
         <svg width="33" height="32" viewBox="0 0 33 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="16.4378" cy="8.89756" r="7.89756" stroke="var(--primary-color)" stroke-width="2" style={{transition: 'stroke 0.3s'}}/>
+        <circle cx="16.4378" cy="8.89756" r="7.89756" stroke="var(--primary-color)" stroke-width="2" style={{transition: 'stroke 0.3s'}} />
         <mask id="path-2-inside-1_11_28" fill="white">
         <path fill-rule="evenodd" clip-rule="evenodd" d="M29.2187 24.9596C30.8486 26.6407 30.7935 29.4135 28.8348 30.6967C27.5769 31.5208 26.0727 32 24.4565 32H8.45652C6.8404 32 5.3362 31.5208 4.07827 30.6967C2.11954 29.4135 2.0644 26.6407 3.6944 24.9596C6.61576 21.9465 11.2452 20 16.4565 20C21.6679 20 26.2973 21.9465 29.2187 24.9596Z"/>
         </mask>
         <path d="M28.8348 30.6967L27.7388 29.0237L28.8348 30.6967ZM27.7388 29.0237C26.7966 29.641 25.6715 30 24.4565 30V34C26.4738 34 28.3571 33.4006 29.9308 32.3696L27.7388 29.0237ZM24.4565 30H8.45652V34H24.4565V30ZM8.45652 30C7.24151 30 6.11644 29.641 5.17427 29.0237L2.98228 32.3696C4.55595 33.4006 6.43928 34 8.45652 34V30ZM5.1303 26.3517C7.63095 23.7726 11.7197 22 16.4565 22V18C10.7707 18 5.60056 20.1204 2.25849 23.5674L5.1303 26.3517ZM16.4565 22C21.1934 22 25.2821 23.7726 27.7827 26.3517L30.6546 23.5674C27.3125 20.1204 22.1423 18 16.4565 18V22ZM5.17427 29.0237C4.46735 28.5606 4.19888 27.3124 5.1303 26.3517L2.25849 23.5674C-0.0700717 25.9691 -0.228265 30.2663 2.98228 32.3696L5.17427 29.0237ZM29.9308 32.3696C33.1413 30.2663 32.9831 25.9691 30.6546 23.5674L27.7827 26.3517C28.7142 27.3124 28.4457 28.5606 27.7388 29.0237L29.9308 32.3696Z" fill="var(--primary-color)" mask="url(#path-2-inside-1_11_28)" style={{transition: 'fill 0.3s'}}/>
+        </svg>
+    ),
+    profileFilled:
+    (
+        <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="15.9813" cy="8.89756" r="8.89756" fill="var(--primary-color)" style={{transition: 'fill 0.3s'}} />
+        <path fill-rule="evenodd" clip-rule="evenodd" d="M28.7622 24.9596C30.3922 26.6407 30.3371 29.4135 28.3784 30.6967C27.1204 31.5208 25.6162 32 24.0001 32H8.0001C6.38398 32 4.87978 31.5208 3.62185 30.6967C1.66312 29.4135 1.60798 26.6407 3.23798 24.9596C6.15934 21.9465 10.7888 20 16.0001 20C21.2114 20 25.8409 21.9465 28.7622 24.9596Z" fill="var(--primary-color)" style={{transition: 'fill 0.3s'}} />
         </svg>
     ),
     vish:
@@ -27,7 +34,20 @@ const svgIcons = {
         </defs>
         </svg>
     ),
-    busket: 
+    vishFilled:
+    (
+        <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <g clip-path="url(#clip0_1_190)">
+        <path fill-rule="evenodd" clip-rule="evenodd" d="M20.1176 27.6636C17.7745 30.0068 13.9755 30.0068 11.6324 27.6636L2.67709 18.7083C-0.96741 15.0638 -0.967409 9.15494 2.67709 5.51044C6.08309 2.10443 11.4668 1.88154 15.1317 4.84176C15.5613 5.1888 16.1887 5.1888 16.6183 4.84176C20.2832 1.88154 25.6669 2.10443 29.0729 5.51044C32.7174 9.15494 32.7174 15.0638 29.0729 18.7083L20.1176 27.6636Z" fill="var(--primary-color)" style={{transition: 'fill 0.3s'}} />
+        </g>
+        <defs>
+        <clipPath id="clip0_1_190">
+        <rect width="32" height="32" fill="white"/>
+        </clipPath>
+        </defs>
+        </svg>
+    ),
+    basket: 
     (
         <svg width="33" height="32" viewBox="0 0 33 32" fill="none" xmlns="http://www.w3.org/2000/svg">
         <g clip-path="url(#clip0_11_17)">
@@ -42,6 +62,16 @@ const svgIcons = {
         <rect width="32" height="32" fill="white" transform="translate(0.133301)"/>
         </clipPath>
         </defs>
+        </svg>
+    ),
+    basketFilled: 
+    (
+        <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M7.47266 11.3177L13.6137 3.50214C14.8149 1.97349 17.1304 1.97349 18.3316 3.50214L24.4727 11.3177" stroke="var(--primary-color)" style={{transition: 'stroke 0.3s'}} stroke-width="2"/>
+        <path d="M0.809237 15.0947C0.386541 12.6494 2.26926 10.4133 4.75078 10.4133H26.6153C29.0969 10.4133 30.9796 12.6494 30.5569 15.0947L28.4675 27.1814C28.136 29.0992 26.4722 30.5 24.526 30.5H6.84014C4.89389 30.5 3.23011 29.0992 2.89859 27.1814L0.809237 15.0947Z" fill="var(--primary-color)" style={{transition: 'fill 0.3s'}} />
+        <line x1="9.47266" y1="17.2848" x2="9.47266" y2="24.5556" stroke="var(--main-color)" style={{transition: 'stroke 0.3s'}} stroke-width="2" stroke-linecap="round"/>
+        <line x1="15.4727" y1="17.2848" x2="15.4727" y2="24.5556" stroke="var(--main-color)" style={{transition: 'stroke 0.3s'}} stroke-width="2" stroke-linecap="round"/>
+        <line x1="21.4727" y1="17.2848" x2="21.4727" y2="24.5556" stroke="var(--main-color)" style={{transition: 'stroke 0.3s'}} stroke-width="2" stroke-linecap="round"/>
         </svg>
     ),
     white:

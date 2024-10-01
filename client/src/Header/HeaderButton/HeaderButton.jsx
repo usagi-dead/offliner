@@ -1,15 +1,14 @@
 import React from 'react';
 import Button from "./Buttons/Button"
 import ThemeToggle from "./Buttons/ThemeToggle"
-import BusketButton from "./Buttons/BusketButton"
+import BasketButton from "./Buttons/BasketButton"
 
-export default function HeaderButton({ link, svg }) {
-
+export default function HeaderButton({ link, svg, svgFilled }) {
     return (
         <>
             { 
             svg == "theme" ? <ThemeToggle /> :
-            svg == "busket" ? <BusketButton link={link} svg={svg} /> : <Button link={link} svg={svg} />
+            svg == "basket" ? <BasketButton link={link} svg={svg} svgFilled={svgFilled} /> : <Button link={link} svg={svg} svgFilled={svgFilled} />
             }  
         </>
     )

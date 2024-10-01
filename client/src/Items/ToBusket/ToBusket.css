@@ -2,14 +2,16 @@
     background-color: var(--accent-color);
     color: var(--main-color);
     font-family: 'Montserrat';
-    font-size: 18px;
+    font-size: 16px;
     font-weight: 400;
     border: none;
     border-radius: 30px;
     height: fit-content;
-    padding: 10px 24px;
+    padding: 13px 0px;
     cursor: pointer;
     transition: scale 0.3s, color 0.3s;
+    text-align: center;
+    width: 160px;
 }
 
 .add-to-busket:hover {

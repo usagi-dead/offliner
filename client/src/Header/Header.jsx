@@ -38,26 +38,26 @@ export default function Header() {
                     />
 
                     <HeaderButton 
-                        link="/"
+                        link="/profile"
                         svg="profile"
+                        svgFilled="profileFilled"
                     />
 
                     <HeaderButton 
-                        link="/favorites/1"
+                        link="/favorites"
                         svg="vish"
+                        svgFilled="vishFilled"
                     />
 
                     <HeaderButton 
-                        link="/"
-                        svg="busket"
+                        link="/basket"
+                        svg="basket"
+                        svgFilled="basketFilled"
                     />
-
                 </div>
-
             </div>
 
             <Navigation />
-            
         </header>
     );
 }

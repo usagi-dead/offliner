@@ -23,7 +23,7 @@ export default function App() {
                         element={<ProductPage category={product.name} url={product.url} />} 
                     />
                 ))}
-                <Route path="/favorites/:page" element={<VishPage />} />
+                <Route path="/favorites" element={<VishPage />} />
                 <Route 
                     path={`/:product/product/:productID`} 
                     element={<Product />} 
