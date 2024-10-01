@@ -18,12 +18,12 @@ header .container {
     width: 76%;
     padding: calc(var(--gap) - 18px) 12%;
     margin: 18px 0px 0px 0px;
-    position: absolute;
     height: fit-content;
+    position: absolute;
     display: flex;
     gap: 0px var(--gap);
     background: var(--main-color);
-    transition: background-color 0.3s, box-shadow 0.3s ease-in-out, transform 0.3s;
+    transition: background-color 0.3s, box-shadow 0.3s ease-in-out;
     z-index: 5;
 }
 
