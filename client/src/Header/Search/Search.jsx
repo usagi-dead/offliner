@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import "./Search.css"
 import gpu from "../../gpu";
 import InputSearchBar from './InputSearchBar/InputSearchBar';
@@ -37,6 +37,18 @@ export default function Search() {
         setSearchTerm('');
     };
 
+    useEffect(() => {
+        if (searchResults.length > 0) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = 'auto';
+        }
+
+        return () => {
+            document.body.style.overflow = 'auto';
+        };
+    }, [searchResults]);
+
     return (
         <>
             <div className="search">
@@ -49,11 +61,10 @@ export default function Search() {
             </div>
 
             {searchResults.length > 0 && (
-                <SearchResults results={searchResults} onClose={handleSearchClose} />
-            )}
-
-            {searchResults.length > 0 && (
-                <div className="overlay"></div>
+                <>
+                    <SearchResults results={searchResults} onClose={handleSearchClose} />
+                    <div className="overlay"></div>
+                </>
             )}
         </>
     );
