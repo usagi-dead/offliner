@@ -5,6 +5,7 @@ footer {
     height: fit-content;
     display: flex;
     align-items: center;
+    transition: background-color 0.3s, box-shadow 0.3s;
     position: relative;
 }
 
@@ -16,6 +17,7 @@ footer .logo {
     height: 48px;
     text-decoration: none;
     color: var(--second-color);
+    transition: color 0.3s;
 }
 
 footer .logo svg {

@@ -7,7 +7,7 @@
     border-radius: var(--border-radius);
     height: fit-content;
     padding: 9px;
-    transition: background-color 0.3s, border 0.3s;
+    transition: border 0.3s;
     border: 1px solid var(--second-color);
     gap: 10px;
 }
