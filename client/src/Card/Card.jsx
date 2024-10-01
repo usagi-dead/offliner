@@ -1,4 +1,5 @@
-import React, { useRef } from 'react';
+import React from 'react';
+import { Link } from 'react-router-dom';
 import classes from './Card.module.css';
 import Specs from './Specs/Specs';
 import ToVish from "../Items/ToVish/ToVish";
@@ -6,16 +7,9 @@ import ToBusket from "../Items/ToBusket/ToBusket";
 
 export default function Card({ product }) {
     const { name, imgUrl, specs, price, origPrice, discount, productUrl } = product;
-    const cardRef = useRef(null);
-
-    const handleCardClick = (event) => {
-        if (!event.target.closest('button')) {
-            window.location.href = `/gpu/product/${productUrl}`;
-        }
-    };
 
     return (
-        <div className={classes.card} ref={cardRef} onClick={handleCardClick}>
+        <Link className={classes.card} to={`/gpu/product/${productUrl}`}>
             <div className={classes.cardImage} style={{ backgroundImage: `url(${imgUrl})` }}></div>
             <div className={classes.contentContainer}>
                 <h1 className={classes.title}>{name}</h1>
@@ -51,6 +45,6 @@ export default function Card({ product }) {
                     </div>
                 </div>
             </div>
-        </div>
+        </Link>
     );
 }

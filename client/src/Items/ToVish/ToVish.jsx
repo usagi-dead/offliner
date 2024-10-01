@@ -13,7 +13,10 @@ export default function ToVish({ vishItem }) {
         setIsWished(wishList.some(item => item.name === name));
     }, [name]);
 
-    const handleWishToggle = () => {
+    const handleWishToggle = (event) => {
+        event.stopPropagation();
+        event.preventDefault(); 
+
         if (isWished) {
             removeFromWishList(name);
         } else {

@@ -9,10 +9,11 @@
     text-decoration: none;
     width: 50px;
     justify-content: center;
+    scale: 0.8;
 }
 
 .itemButton:hover {
-    scale: 1.2;
+    scale: 1;
     transition: all 0.3s;
     --primary-color: #025ADD;
 }
