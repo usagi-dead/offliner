@@ -16,7 +16,7 @@
 }
 
 .search:hover .search-button {
-    border: 1px solid var(--text-color);
+    border: 1px solid var(--accent-color);
     border-left: none;
 }
 

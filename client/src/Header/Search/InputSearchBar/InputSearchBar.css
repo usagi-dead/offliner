@@ -22,5 +22,5 @@
 
 .search:hover .search-bar {
     color: var(--text-color);
-    border: 1px solid var(--text-color);
+    border: 1px solid var(--accent-color);
 }

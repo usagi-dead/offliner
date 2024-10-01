@@ -22,7 +22,7 @@
 }
 
 .pagination:hover {
-    border: 1px solid var(--text-color);
+    border: 1px solid var(--accent-color);
 }
 
 .pagination-button {
@@ -58,7 +58,7 @@
     font-weight: 300;
     background-color: var(--main-color);
     font-size: 16px;
-    transition: border 0.3s;
+    transition: border 0.3s, color 0.3s;
     cursor: pointer;
     display: flex;
     justify-content: space-between;
@@ -71,7 +71,7 @@
 }
 
 .move-button:hover {
-    border: 1px solid var(--text-color);
+    border: 1px solid var(--accent-color);
 }
 
 .dots {
