@@ -27,7 +27,7 @@
 
 .pagination-button {
     font-family: 'Montserrat';
-    font-weight: 300;
+    font-weight: 400;
     background-color: var(--main-color);
     border: none;
     font-size: 16px;
@@ -55,7 +55,7 @@
     border: 1px solid var(--second-color);
     border-radius: var(--border-radius);
     font-family: 'Montserrat';
-    font-weight: 300;
+    font-weight: 400;
     background-color: var(--main-color);
     font-size: 16px;
     transition: border 0.3s, color 0.3s;
