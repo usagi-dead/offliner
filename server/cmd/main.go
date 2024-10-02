@@ -1,22 +1,35 @@
 package main
 
 import (
-	"net/http"
-
-	"github.com/labstack/echo/v4"
+	"log/slog"
+	"os"
+	"server/Iternal/config"
 )
 
 func main() {
-	e := echo.New()
 
-	e.GET("/", func(c echo.Context) error {
-		return c.String(http.StatusOK, "Hello, World!")
-	})
+	cfg := config.MustLoad()
 
-	e.POST("/users", func(c echo.Context) error {
-		name := c.FormValue("name")
-		return c.String(http.StatusOK, "User created: "+name)
-	})
+	log := SetupLogger(cfg.Env)
+	log.Info("starting offliner server", slog.String("env", cfg.Env))
 
-	e.Start(":8080")
+	//TODO: db init
+
+	//TODO: router init
+
+	//TODO: run server
+
+}
+
+func SetupLogger(env string) *slog.Logger {
+	var log *slog.Logger
+	switch env {
+	case "local":
+		log = slog.New(
+			slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelDebug}))
+	case "dev":
+		log = slog.New(
+			slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelInfo}))
+	}
+	return log
 }
