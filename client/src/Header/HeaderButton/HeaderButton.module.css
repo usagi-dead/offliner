@@ -12,6 +12,10 @@
     scale: 0.8;
 }
 
+.itemButton svg {
+    height: 100%;
+}
+
 .itemButton:hover {
     scale: 1;
     transition: all 0.3s;
