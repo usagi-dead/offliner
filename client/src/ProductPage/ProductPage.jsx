@@ -32,25 +32,47 @@ export default function ProductPage({ url, category }) {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }, [pathname]);
 
+
+    const [isScrolled, setIsScrolled] = useState(false);
+
+    useEffect(() => {
+        const handleScroll = () => {
+            const scrollTop = window.scrollY;
+            setIsScrolled(scrollTop > 20); 
+        };
+
+        window.addEventListener("scroll", handleScroll);
+
+        return () => {
+        window.removeEventListener("scroll", handleScroll);
+        };
+    }, []);
+
     return (
         <section className="products-page">
             <div className='products-container'>
                 <h1 className='title'>{category}</h1>
-                <div className='products-cards-container'>
-                    {currentItems.map((item, index) => (
-                        <Card 
-                            key={index} 
-                            product={{
-                                name: item.name, 
-                                imgUrl: item.imageURL, 
-                                specs: item.specs, 
-                                price: item.currentPrice,
-                                origPrice: item.originalPrice,
-                                discount: item.discount,
-                                productUrl: index + (ITEMS_PER_PAGE * (page - 1))
-                            }} 
-                        />
-                    ))}
+                <div className='products-content-container'>
+                    <div className='products-filters-container'>
+
+                    </div>
+                    
+                    <div className='products-cards-container'>
+                        {currentItems.map((item, index) => (
+                            <Card 
+                                key={index} 
+                                product={{
+                                    name: item.name, 
+                                    imgUrl: item.imageURL, 
+                                    specs: item.specs, 
+                                    price: item.currentPrice,
+                                    origPrice: item.originalPrice,
+                                    discount: item.discount,
+                                    productUrl: index + (ITEMS_PER_PAGE * (page - 1))
+                                }} 
+                            />
+                        ))}
+                    </div>
                 </div>
                 {totalPages > 1 && (
                     <Pagination 

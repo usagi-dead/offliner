@@ -9,12 +9,12 @@ export default function VishPage() {
     const [items, setItems] = useState([]);
 
     useEffect(() => {
-        setItems(getWishList());
-    }, []);
+        window.scrollTo({ top: 0 });
+    }, [pathname]);
 
     useEffect(() => {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    }, [pathname]);
+        setItems(getWishList());
+    }, []);
 
     return (
         <section className="vish-page">

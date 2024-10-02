@@ -9,7 +9,7 @@
     box-shadow: 0px 0px 35px var(--shadow);
     background-color: var(--main-color);
     padding: var(--container-padding);
-    min-height: 610px;
+    min-height: 620px;
     transition: background-color 0.3s;
 }
 

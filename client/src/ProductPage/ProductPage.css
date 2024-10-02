@@ -9,14 +9,23 @@
     box-shadow: 0px 0px 35px var(--shadow);
     background-color: var(--main-color);
     padding: var(--container-padding);
-    min-height: 610px;
+    min-height: 620px;
     transition: background-color 0.3s;
 }
 
-.products-cards-container {
-    margin-left: 400px;
-    gap: var(--gap);
+.products-content-container {
+    display: flex;
     margin-top: var(--gap);
+    gap: var(--gap);
+}
+
+.products-filters-container {
+    padding-top: 700px;
+    flex: 1;
+}
+
+.products-cards-container {
+    gap: var(--gap);
     display: flex;
     flex-wrap: wrap;
     justify-content: center;

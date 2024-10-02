@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import "./Product.css";
-import { useParams } from 'react-router-dom';
+import { useParams, useLocation } from 'react-router-dom';
 import gpu from '../gpu';
 import Specs from "../Card/Specs/Specs";
 import ToVish from "../Items/ToVish/ToVish";
@@ -9,9 +9,10 @@ import ToBusket from "../Items/ToBusket/ToBusket";
 export default function ProductPage() {
     const { productID } = useParams();
     const product = gpu[productID];
+    const { pathname } = useLocation();
 
     if (!product) {
-        return <div>Товар не найден</div>;
+        return <div className="product-page product-container title">Товар не найден</div>;
     }
 
     const groupedSpecs = Object.entries(product.specs).reduce((acc, [key, value]) => {
@@ -22,6 +23,10 @@ export default function ProductPage() {
         acc[category].push({ spec, value });
         return acc;
     }, {});
+
+    useEffect(() => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }, [pathname]);
 
     return (
         <div className="product-page">

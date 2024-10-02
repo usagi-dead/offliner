@@ -1,3 +1,5 @@
+import React, { useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import "./HomePage.css"
 import Weather from './Weather/Weather'
 import Sales from './Sales/Sales'
@@ -6,6 +8,12 @@ import productNames from "../data"
 import svgIcons from "../svgIcons"
 
 export default function HomePage() {
+    const { pathname } = useLocation();
+
+    useEffect(() => {
+        window.scrollTo({ top: 0 });
+    }, [pathname]);
+
     return (
         <>
             <section className="content-top">
