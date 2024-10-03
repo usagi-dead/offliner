@@ -7,6 +7,7 @@
 
     --background-color: #F5F5F5;
     --main-color: white;
+    --main-color-alpha: rgba(255, 255, 255, 0.5);
     --text-color: black;
     --second-color: #D9D9D9;
     --accent-color: #025ADD;
@@ -19,6 +20,7 @@
 [data-theme="black"] {
     --background-color: #0c0c0c;
     --main-color: #1b1b1b;
+    --main-color-alpha: #1b1b1b9c;
     --text-color: white;
     --second-color: #424242;
     --accent-color: #025ADD;
