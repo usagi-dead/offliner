@@ -1,9 +1,9 @@
 .add-to-busket {
     background-color: var(--accent-color);
-    color: white;
+    color: var(--main-color);
     font-family: 'Montserrat';
     font-size: 16px;
-    font-weight: 400;
+    font-weight: 500;
     border: none;
     border-radius: var(--border-radius);
     height: fit-content;

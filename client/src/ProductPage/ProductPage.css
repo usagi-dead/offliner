@@ -20,7 +20,11 @@
 }
 
 .products-filters-container {
-    flex: 1;
+    min-width: 300px;
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap);
+    height: fit-content;
 }
 
 .products-cards-container {
@@ -28,5 +32,4 @@
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    width: calc(100% - 400px);
 }

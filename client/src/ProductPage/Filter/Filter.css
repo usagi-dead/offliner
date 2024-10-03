@@ -1,7 +1,8 @@
 .filter {
     border: 1px solid var(--second-color);
     border-radius: var(--border-radius);
-    width: calc(100% - 40px);
+    color: var(--text-color);
+    width: calc(100% - 42px);
     padding: 20px;
     height: fit-content;
     font-size: 16px;
@@ -9,4 +10,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
+    cursor: pointer;
+    transition: color 0.3s, border 0.3s;
+    flex: 1;
 }

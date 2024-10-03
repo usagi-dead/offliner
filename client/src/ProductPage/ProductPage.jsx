@@ -5,6 +5,7 @@ import Card from '../Card/Card';
 import gpu from '../gpu';
 import Pagination from './Pagination/Pagination';
 import Filter from './Filter/Filter';
+import FilterButton from './FilterButton/FilterButton';
 
 const ITEMS_PER_PAGE = 27;
 
@@ -56,6 +57,13 @@ export default function ProductPage({ url, category }) {
                 <div className='products-content-container'>
                     <div className='products-filters-container'>
                         <Filter />
+                        <Filter />
+                        <Filter />
+                        <Filter />
+                        <Filter />
+                        <Filter />
+                        <Filter />
+                        <FilterButton />
                     </div>
                     
                     <div className='products-cards-container'>

@@ -11,6 +11,7 @@
     text-decoration: none;
     width: 100%;
     color: var(--text-color);
+    min-width: fit-content;
 }
 
 .card:hover {
@@ -47,6 +48,7 @@
 
 .bottomContainer {
     justify-content: space-between;
+    min-width: max-content;
 }
 
 .notInStock, .defaultPrice, .price, .title {
@@ -75,6 +77,7 @@
     display: flex;
     flex-direction: column;
     align-items: flex-start;
+    min-width: fit-content;
 }
 
 .buttons {
@@ -120,6 +123,7 @@
     font-size: 22px;
     color: var(--text-color);
     transition: color 0.3s;
+    max-height: 54px;
 }
 
 .notInStock {
