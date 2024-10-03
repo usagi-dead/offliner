@@ -18,14 +18,12 @@ export default function Specs({ specs }) {
         });
 
     return (
-        <div className={classes.specsContainer}>
-            <ul className={classes.specList}>
-                {displayedSpecs.map((spec, index) => (
-                    <li key={index} className={classes.specItem}>
-                        {spec.value}
-                    </li>
-                ))}
-            </ul>
-        </div>
+        <ul className={classes.specList}>
+            {displayedSpecs.map((spec, index) => (
+                <li key={index} className={classes.specItem}>
+                    {spec.value}
+                </li>
+            ))}
+        </ul>
     );
 }

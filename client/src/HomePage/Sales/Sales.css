@@ -123,12 +123,12 @@
     height: 130px;
     top: 50px;
     right: 50px;
-    background-color: #025ADD;
+    background-color: var(--accent-color);
     display: flex;
     justify-content: center;
     align-items: center;
     border-radius: 100px;
-    color: var(--main-color);
+    color: white;
     font-size: 46px;
     font-weight: 200;
     transition: color 0.3s;

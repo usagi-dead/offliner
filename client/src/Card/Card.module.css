@@ -55,7 +55,7 @@
 }
 
 .price {
-    font-size: 38px;
+    font-size: 42px;
     font-weight: 900;
 }
 
@@ -63,13 +63,18 @@
     font-size: 16px;
     font-weight: 300;
     color: var(--second-color);
-    margin: 6px 8px;
+    margin: 0px;
     text-decoration: line-through;
     transition: color 0.3s;
+    position: absolute;
+    bottom: 74px;
 }
 
 .priceContainer {
     height: fit-content;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
 }
 
 .buttons {
@@ -90,7 +95,7 @@
     font-family: 'Montserrat';
     font-weight: 300;
     font-size: 20px;
-    background-color: #025ADD;
+    background-color: var(--accent-color);
     border-radius: 50px;
     color: white;
     height: 70px;

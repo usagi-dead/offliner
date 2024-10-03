@@ -1,8 +1,13 @@
 .specList {
     padding-left: 20px;
     margin: 10px 0px;
-    height: 70px;
+    height: 78px;
     display: flex;
     flex-direction: column;
     flex-wrap: wrap;
+}
+
+.specItem {
+    margin: 3px 0px;
+    font-weight: 400;
 }

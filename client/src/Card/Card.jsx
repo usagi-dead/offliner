@@ -30,8 +30,8 @@ export default function Card({ product }) {
                                     <h1 className={classes.price}>{price}</h1>
                                 ) : (
                                     <>
-                                        <h1 className={`${classes.price} ${classes.blue}`}>{price}</h1>
                                         <h3 className={classes.defaultPrice}>{origPrice}</h3>
+                                        <h1 className={`${classes.price} ${classes.blue}`}>{price}</h1>
                                     </>
                                 )}
                             </div>
