@@ -1,7 +1,7 @@
 import React from 'react';
 import classes from './Specs.module.css';
 
-export default function Specs({ specs }) {
+export default function Specs({ specs, textSize }) {
     const DISPLAYED_SPECS = [
         "Технические характеристики: Видеопамять",
         "Технические характеристики: Тип видеопамяти",
@@ -18,9 +18,9 @@ export default function Specs({ specs }) {
         });
 
     return (
-        <ul className={classes.specList}>
+        <ul className={classes.specList} style={{ height: textSize * 4 + 8 + "px" }}>
             {displayedSpecs.map((spec, index) => (
-                <li key={index} className={classes.specItem}>
+                <li key={index} className={classes.specItem} style={{ fontSize: textSize + "px" }}>
                     {spec.value}
                 </li>
             ))}

@@ -31,13 +31,24 @@ export default function ProductPage() {
     return (
         <div className="product-page">
             <div className='product-container'>
-                <h1 className='title'>{product.name}</h1>
+                <h1 className='title'>Видеокарты</h1>
                 <div className='product-content-container'>
                     <div className='product-image-container'>
-                        <img src={product.imageURL} alt={product.name} className='product-image' />
+                        <div className='image-swapper'>
+                            <img src={product.imageURL} alt={product.name} className='swap-image' />
+                            <img src={product.imageURL} alt={product.name} className='swap-image' />
+                            <img src={product.imageURL} alt={product.name} className='swap-image' />
+                            <img src={product.imageURL} alt={product.name} className='swap-image' />
+                            <img src={product.imageURL} alt={product.name} className='swap-image' />
+                        </div>
+                        <div className='main-image'>
+                            <img src={product.imageURL} alt={product.name} className='product-image' />
+                        </div>
                     </div>
                     <div className='product-text-container'>
-                        <Specs specs={product.specs} />
+                        <h2 className='product-name'>{product.name}</h2>
+
+                        <Specs specs={product.specs} textSize="20" />
 
                         <div className="product-prices">
                             {product.currentPrice && <h2 className={product.originalPrice ? "price blue" : "price"}>{product.currentPrice}</h2>}
