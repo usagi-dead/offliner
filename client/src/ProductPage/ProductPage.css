@@ -19,14 +19,6 @@
     gap: var(--gap);
 }
 
-.products-filters-container {
-    min-width: 300px;
-    display: flex;
-    flex-direction: column;
-    gap: var(--gap);
-    height: fit-content;
-}
-
 .products-cards-container {
     gap: var(--gap);
     display: flex;

@@ -10,7 +10,7 @@
     text-align: center;
     user-select: none;
     cursor: pointer;
-    transition: color 0.3s;
+    transition: color 0.3s, transform 0.3s;
 }
 
 .fixed {

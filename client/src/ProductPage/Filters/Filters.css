@@ -1,0 +1,8 @@
+.filters-container {
+    min-width: 300px;
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap);
+    height: fit-content;
+    margin-bottom: var(--gap);
+}

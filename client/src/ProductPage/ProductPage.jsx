@@ -4,8 +4,7 @@ import "./ProductPage.css";
 import Card from '../Card/Card';
 import gpu from '../gpu';
 import Pagination from './Pagination/Pagination';
-import Filter from './Filter/Filter';
-import FilterButton from './FilterButton/FilterButton';
+import Filters from './Filters/Filters';
 
 const ITEMS_PER_PAGE = 27;
 
@@ -34,37 +33,12 @@ export default function ProductPage({ url, category }) {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }, [pathname]);
 
-
-    const [isScrolled, setIsScrolled] = useState(false);
-
-    useEffect(() => {
-        const handleScroll = () => {
-            const scrollTop = window.scrollY;
-            setIsScrolled(scrollTop > 20); 
-        };
-
-        window.addEventListener("scroll", handleScroll);
-
-        return () => {
-        window.removeEventListener("scroll", handleScroll);
-        };
-    }, []);
-
     return (
         <section className="products-page">
             <div className='products-container'>
                 <h1 className='title'>{category}</h1>
                 <div className='products-content-container'>
-                    <div className='products-filters-container'>
-                        <Filter />
-                        <Filter />
-                        <Filter />
-                        <Filter />
-                        <Filter />
-                        <Filter />
-                        <Filter />
-                        <FilterButton />
-                    </div>
+                    <Filters />
                     
                     <div className='products-cards-container'>
                         {currentItems.map((item, index) => (
