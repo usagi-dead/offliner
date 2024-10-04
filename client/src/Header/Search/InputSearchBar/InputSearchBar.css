@@ -1,7 +1,6 @@
 .search-bar {
     width: 100%;
-    backdrop-filter: blur(10px);
-    background: var(--main-color-alpha);
+    background: none;
     border: 1px solid var(--second-color);
     border-radius: 100px 0px 0px 100px;
     height: 26px;

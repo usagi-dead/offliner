@@ -1,8 +1,6 @@
 .search-button {
     flex: 0;
     min-width: 70px;
-    backdrop-filter: blur(10px);
-    background: var(--main-color-alpha);
     width: 70px;
     border: 1px solid var(--second-color);
     border-radius: 0px 100px 100px 0px;
