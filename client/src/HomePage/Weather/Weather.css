@@ -86,7 +86,7 @@
 
 .weather-img {
     position: absolute;
-    right: var(--container-padding);
+    right: 20px;
     top: 44%;
     transform: translate(0%, -50%);
     scale: 0.86;

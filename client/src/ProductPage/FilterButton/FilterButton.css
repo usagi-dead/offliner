@@ -2,15 +2,21 @@
     background: var(--accent-color);
     border-radius: var(--border-radius);
     color: var(--main-color);
-    width: 260px;
-    padding: 20px;
+    width: 300px;
+    padding: 20px 0px;
+    border: none;
     height: fit-content;
     font-size: 16px;
     font-weight: 500;
+    font-family: 'Montserrat';
     text-align: center;
     user-select: none;
     cursor: pointer;
-    transition: color 0.3s, transform 0.3s;
+    transition: color 0.3s, scale 0.3s;
+}
+
+.filter-button:hover {
+    scale: 1.05;
 }
 
 .fixed {

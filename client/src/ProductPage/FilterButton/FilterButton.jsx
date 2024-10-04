@@ -23,8 +23,8 @@ export default function FilterButton({ filters }) {
       }, []);
 
     return (
-        <div className={isFixed ? "filter-button fixed" : "filter-button"}>
+        <button className={isFixed ? "filter-button fixed" : "filter-button"}>
             Найти
-        </div>
+        </button>
     );
 }

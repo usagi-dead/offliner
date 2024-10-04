@@ -4,15 +4,19 @@ import svgIcons from "../../svgIcons";
 
 export default function Filter() {
     const filter = useRef(null);
+    const [isClicked, setIsClicked] = useState(false);
+
     function handleFilterClick(e) {
-        e.preventDefault();    
-        console.log('You clicked filter.');
+        e.preventDefault();   
+        console.log(e);
+
+        setIsClicked
     }
 
     return (
-        <div ref={filter} className="filter" onClick={handleFilterClick}>
+        <button ref={filter} className={isFixed ? "filter clicked" : "filter"} onClick={handleFilterClick}>
             Производитель
             {svgIcons["filterArrow"]}
-        </div>
+        </button>
     );
 }

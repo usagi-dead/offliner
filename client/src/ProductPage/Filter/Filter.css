@@ -1,6 +1,7 @@
 .filter {
     border: 1px solid var(--second-color);
     border-radius: var(--border-radius);
+    background: none;
     color: var(--text-color);
     width: calc(100% - 42px);
     padding: 20px;
@@ -11,6 +12,10 @@
     align-items: center;
     justify-content: space-between;
     cursor: pointer;
-    transition: color 0.3s, border 0.3s;
+    transition: color 0.3s, border 0.3s, transform 0.3s;
     flex: 1;
+}
+
+.clicked {
+    height: 500px;
 }
