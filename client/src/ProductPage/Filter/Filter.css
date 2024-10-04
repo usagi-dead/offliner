@@ -1,3 +1,17 @@
+:root {
+    --rotate: 0deg;
+}
+
+.filter-text {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-family: 'Montserrat';
+    font-size: 16px;
+    font-weight: 500;
+    width: 100%;
+}
+
 .filter {
     border: 1px solid var(--second-color);
     border-radius: var(--border-radius);
@@ -5,17 +19,67 @@
     color: var(--text-color);
     width: calc(100% - 42px);
     padding: 20px;
-    height: fit-content;
-    font-size: 16px;
-    font-weight: 500;
+    height: 60px;
+    cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    cursor: pointer;
-    transition: color 0.3s, border 0.3s, transform 0.3s;
-    flex: 1;
+    flex-direction: column;
+    gap: 20px;
+    transition: color 0.3s, border 0.3s, height 0.3s ease-in-out;
+    width: 100%;
+}
+
+.filter-arrow {
+    display: flex;
+    align-items: center;
+    transition: rotate 0.3s ease-in-out;
+    rotate: var(--rotate);
+}
+
+.filter:hover {
+    border: 1px solid var(--accent-color);
+
 }
 
 .clicked {
-    height: 500px;
+    height: 200px;
+    --rotate: 90deg;
+}
+
+.filters {
+    flex: 1;
+    width: 100%;
+    transition: opacity 0.3s ease;
+    font-family: 'Montserrat';
+    font-size: 16px;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    align-items: flex-start;
+}
+
+.filters-hidden {
+    opacity: 0; 
+    pointer-events: none; 
+}
+
+.filter-checkbox-container {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    cursor: default;
+}
+
+.filter-checkbox+label {
+    width: 100%;
+    text-align: left;
+    cursor: pointer;
+}
+
+.filter-checkbox {
+    border-radius: 5px;
+    width: 20px;
+    height: 20px;
+    border: 2px solid red;
 }

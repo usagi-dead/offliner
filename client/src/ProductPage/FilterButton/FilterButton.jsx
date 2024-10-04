@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import "./FilterButton.css";
 
 export default function FilterButton({ filters }) {
-    const [isFixed, setIsFixed] = useState(false);
+    const [isFixed, setIsFixed] = useState(true);
 
     const handleScroll = () => {
         const filtersBottom = filters.current.getBoundingClientRect().bottom;

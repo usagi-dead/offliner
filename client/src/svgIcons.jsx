@@ -183,18 +183,6 @@ const svgIcons = {
         <path d="M29 66L29 1" stroke="#025ADD" stroke-width="2" stroke-linecap="round"/>
         </svg>
     ),
-    backArrow:
-    (
-        <svg width="7" height="14" viewBox="0 0 7 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M6 0.5L1.25221 5.64344C0.545018 6.40956 0.545019 7.59044 1.25221 8.35656L6 13.5" stroke="var(--primary-color)" strokeLinecap="round" style={{transition: 'fill 0.3s'}}/>
-        </svg>
-    ),
-    forwardArrow:
-    (
-        <svg width="7" height="14" viewBox="0 0 7 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M1 0.5L5.74779 5.64344C6.45498 6.40956 6.45498 7.59044 5.74779 8.35656L1 13.5" stroke="var(--primary-color)" strokeLinecap="round" style={{transition: 'fill 0.3s'}}/>
-        </svg>
-    ),
     inst:
     (
         <svg width="21" height="20" viewBox="0 0 21 20" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -219,7 +207,7 @@ const svgIcons = {
         <path d="M21.9372 1.63827L18.6172 16.9135C18.3665 17.9914 17.7135 18.2597 16.7855 17.7522L11.7265 14.1153L9.28584 16.406C9.01552 16.6697 8.79 16.8897 8.26901 16.8897L8.63284 11.8637L18.0082 3.59856C18.416 3.24437 17.9194 3.04735 17.3748 3.4023L5.78432 10.5228L0.794506 8.99874C-0.290681 8.66831 -0.310326 7.94001 1.02082 7.43173L20.5377 0.0958002C21.4413 -0.23462 22.2319 0.291292 21.9372 1.63827Z" fill="var(--primary-color)" style={{transition: 'fill 0.3s'}}/>
         </svg>
     ),
-    filterArrow:
+    smallArrow:
     (
         <svg width="10" height="19" viewBox="0 0 10 19" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path d="M1.86767 17.2343L7.74636 11.3556C8.91793 10.184 8.91793 8.28454 7.74635 7.11296L1.86768 1.23428" stroke="var(--primary-color)" style={{transition: 'stroke 0.3s'}} stroke-width="2" stroke-linecap="round"/>

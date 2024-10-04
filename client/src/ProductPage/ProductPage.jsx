@@ -55,15 +55,15 @@ export default function ProductPage({ url, category }) {
                                 }} 
                             />
                         ))}
+                        {totalPages > 1 && (
+                            <Pagination 
+                                currentPage={currentPage} 
+                                totalPages={totalPages} 
+                                onPageChange={handlePageChange} 
+                            />
+                        )}
                     </div>
                 </div>
-                {totalPages > 1 && (
-                    <Pagination 
-                        currentPage={currentPage} 
-                        totalPages={totalPages} 
-                        onPageChange={handlePageChange} 
-                    />
-                )}
             </div>
         </section>
     );

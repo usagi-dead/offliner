@@ -81,7 +81,7 @@ export default function Pagination({ currentPage, totalPages, onPageChange }) {
     return (
         <div className="pagination-container">
             <button className='move-button' onClick={() => handlePageChange(currentPage - 1)}>
-                {svgIcons["backArrow"]}
+                <span className='left-arrow'>{svgIcons["smallArrow"]}</span>
                 Назад
             </button>
 
@@ -91,7 +91,7 @@ export default function Pagination({ currentPage, totalPages, onPageChange }) {
 
             <button className='move-button' onClick={() => handlePageChange(currentPage + 1)}>
                 Вперед
-                {svgIcons["forwardArrow"]}
+                {svgIcons["smallArrow"]}
             </button>
         </div>
     );
