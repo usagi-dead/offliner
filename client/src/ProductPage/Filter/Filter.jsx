@@ -2,12 +2,9 @@ import React, { useState, useEffect, useRef } from 'react';
 import "./Filter.css";
 import svgIcons from "../../svgIcons";
 
-export default function Filter({ filterKey, text, isOpen }) {
+export default function Filter({ filterKey, text, isOpen, isInput, filters, max }) {
     const filter = useRef(null);
     const [isClicked, setIsClicked] = useState(isOpen);
-    const filtersss = ["zxc","zxc","zxc","zxc","zxc","zxc","zxc","zxc","zxc","zxc","zxc","zxc","zxc","zxc","zxc","zxc","zxc","zxc"];
-    const isInput = true;
-    const maxLength = "10";
 
     function handleFilterClick(e) {
         e.preventDefault();   
@@ -28,10 +25,10 @@ export default function Filter({ filterKey, text, isOpen }) {
             <div className={`filters-input-container ${isClicked ? '' : 'filters-hidden'}`} onClick={handleFilters} tabIndex="-1">
                 <input type="number" className="filter-input" placeholder='от' />
                 <span className="filter-line" />
-                <input type="number" className="filter-input" placeholder='8' />
+                <input type="number" className="filter-input" placeholder={max} />
             </div> :
             <div className={`filters ${isClicked ? '' : 'filters-hidden'}`} onClick={handleFilters} tabIndex="-1">
-                {filtersss.map((prod, index) => {
+                {filters.map((prod, index) => {
                     return ( 
                         <label for={filterKey+"|"+index} className='filter-label'>
                             <input key={index} id={filterKey+"|"+index} type='checkbox' className='real-checkbox' tabIndex={isClicked ? "0" : "-1"} />
