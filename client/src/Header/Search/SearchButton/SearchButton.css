@@ -14,11 +14,6 @@
     transition: background-color 0.3s, border 0.3s;
 }
 
-.search:hover .search-button {
-    border: 1px solid var(--accent-color);
-    border-left: none;
-}
-
 .search:hover .search-button:hover svg {
     --text-color: var(--accent-color);
 }

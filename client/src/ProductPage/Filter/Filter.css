@@ -27,7 +27,7 @@
     flex-direction: column;
     gap: 20px;
     transition: color 0.3s, border 0.3s, height 0.3s ease-in-out;
-    width: 100%;
+    width: 300px;
 }
 
 .filter-arrow {
@@ -47,6 +47,11 @@
     --rotate: 90deg;
 }
 
+.clicked-input {
+    height: 120px;
+    --rotate: 90deg;
+}
+
 .filters {
     flex: 1;
     width: 100%;
@@ -57,6 +62,7 @@
     flex-direction: column;
     overflow-y: auto;
     align-items: flex-start;
+    gap: 5px;
 }
 
 .filters-hidden {
@@ -64,22 +70,107 @@
     pointer-events: none; 
 }
 
-.filter-checkbox-container {
-    width: 100%;
-    display: flex;
-    align-items: center;
-    cursor: default;
+.real-checkbox {
+    width: 0px;
+    height: 0px;
+    margin: 0px;
 }
 
-.filter-checkbox+label {
+.filter-label {
     width: 100%;
     text-align: left;
     cursor: pointer;
 }
 
 .filter-checkbox {
-    border-radius: 5px;
+    border: 1px solid var(--second-color);
+    border-radius: 33%;
+    display: inline-block;
+    vertical-align: middle;
     width: 20px;
     height: 20px;
-    border: 2px solid red;
+    margin-right: 8px;
+    transition: border 0.3s, background-color 0.3s;
+    position: relative;
+}
+
+.filter-label:hover .filter-checkbox {
+    background-color: var(--second-accent-color);
+}
+
+.filter-checkbox::before {
+    content: '';
+    color: var(--main-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: url("../../Checkbox.svg") no-repeat 50% 50%;
+    width: 20px;
+    height: 20px;
+    opacity: 0;
+    transition: opacity 0.3s;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.real-checkbox:checked + .filter-checkbox {
+    background-color: var(--accent-color);
+    border: 1px solid var(--accent-color);
+    animation: checkbox-bounce 0.3s, checkbox-check 0.3s;
+}
+
+.real-checkbox:checked + .filter-checkbox::before {
+    opacity: 1;
+}
+
+.filters-input-container {
+    flex: 1;
+    border: 1px solid var(--second-color);
+    width: calc(100% - 32px);
+    display: flex;
+    justify-content: center;
+    gap: 5px;
+    height: 60px;
+    padding: 0px 16px;
+    border-radius: var(--border-radius);
+    transition: border 0.3s, opacity 0.3s;
+}
+
+.filters-input-container:hover {
+    --second-color: var(--accent-color);
+}
+
+.filter-input {
+    font-family: 'Montserrat';
+    max-width: 46%;
+    min-height: 0px;
+    border: none;
+}
+
+.filter-input:focus {
+    outline: none;
+}
+
+.filter-line {
+    height: 100%;
+    min-width: 1px;
+    background-color: var(--second-color);
+    transition: background-color 0.3s;
+}
+
+@keyframes checkbox-bounce {
+    0% {
+        scale: 1;
+    }
+    33% {
+        scale: 0.85;
+    }
+    66% {
+        scale: 1.1;
+    }
+    100% {
+        scale: 1;
+    }
 }

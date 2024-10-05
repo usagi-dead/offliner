@@ -5,24 +5,29 @@ import FilterButton from '../FilterButton/FilterButton';
 
 export default function Filters() {
     const filters = useRef(null);
+    const filtersss = [
+        {name: "Производитель", isOpen: true},
+        {name: "Производитель", isOpen: true},
+        {name: "Производитель", isOpen: false},
+        {name: "Производитель", isOpen: false},
+        {name: "Производитель", isOpen: false},
+        {name: "Производитель", isOpen: false},
+        {name: "Производитель", isOpen: false},
+        {name: "Производитель", isOpen: false},
+        {name: "Производитель", isOpen: false},
+        {name: "Производитель", isOpen: false},
+        {name: "Производитель", isOpen: false},
+        {name: "Производитель", isOpen: false}
+    ];
 
     return (
         <div>
             <div ref={filters} className='filters-container'>
-                <Filter />
-                <Filter />
-                <Filter />
-                <Filter />
-                <Filter />
-                <Filter />
-                <Filter />
-                <Filter />
-                <Filter />
-                <Filter />
-                <Filter />
-                <Filter />
-                <Filter />
-                <Filter />
+                {filtersss.map((prod, index) => {
+                    return ( 
+                        <Filter filterKey={index} text={prod.name} isOpen={prod.isOpen} />
+                    );
+                })}
             </div>
             <FilterButton filters={filters} />
         </div>

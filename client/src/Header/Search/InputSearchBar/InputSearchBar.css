@@ -9,18 +9,13 @@
     font-weight: 400;
     padding: 10px 20px;
     font-size: 16px;
-    color: var(--second-color);
+    color: var(--text-color);
     transition: color 0.3s, background-color 0.3s, border 0.3s;
     z-index: 3;
     font-family: 'Montserrat';
 }
 
-.search-bar:focus {
-    color: var(--text-color);
+.search-bar:focus, .search-bar:focus + .search-button {
+    --second-color: var(--accent-color);
     outline: none;
-}
-
-.search:hover .search-bar {
-    color: var(--text-color);
-    border: 1px solid var(--accent-color);
 }
