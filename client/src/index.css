@@ -44,3 +44,8 @@ body {
     margin: 0px;
     user-select: none;
 }
+
+html {
+    scrollbar-width: thin;
+    scrollbar-color: var(--second-color) var(--background-color);
+}
