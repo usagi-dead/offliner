@@ -14,7 +14,7 @@ export default function Filters() {
             max: null,
         },
         {
-            name: "Цена ввыааааааа ываываываыв аываываываыв", 
+            name: "Цена", 
             isOpen: true,
             isInput: true,
             filters: null,

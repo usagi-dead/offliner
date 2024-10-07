@@ -52,6 +52,10 @@
     --rotate: 90deg;
 }
 
+.filter.clicked .filters-input-container {
+    outline: 1px solid var(--second-color);
+}
+
 .filters {
     width: 100%;
     font-family: 'Montserrat';
@@ -63,13 +67,16 @@
     scrollbar-color: var(--second-color) var(--main-color);
     align-items: flex-start;
     gap: 5px;
-    max-height: 0;
     transition: max-height 0.3s ease;
 }
 
 .filters-input-show {
-    max-height: 40px;
-    transition: max-height 0.3s ease;
+    height: 42px;
+    max-height: 42px;
+}
+
+.filters-input-show input.filter-input {
+    height: 40px;
 }
 
 .filters-show {
@@ -79,7 +86,6 @@
 .filters-hidden {
     max-height: 0px; 
     pointer-events: none; 
-    border: none;
 }
 
 .real-checkbox {
@@ -138,15 +144,15 @@
 }
 
 .filters-input-container {
+    outline: 1px solid var(--main-color);
     flex: 1;
-    border: 1px solid var(--second-color);
     width: calc(100% - 32px);
     display: flex;
     justify-content: center;
     gap: 5px;
     padding: 0px 16px;
     border-radius: var(--border-radius);
-    transition: border 0.3s, height 0.3s;
+    transition: height 0.3s, max-height 0.3s, outline 0.3s;
 }
 
 .filters-input-container:hover {
@@ -156,12 +162,14 @@
 .filter-input {
     font-family: 'Montserrat';
     max-width: 46%;
-    min-height: 0px;
     border: none;
     outline: none;
+    padding: 0px;
+    height: 0px;
     background-color: var(--main-color);
     transition: background-color 0.3s;
     color: var(--text-color);
+    transition: height 0.3s;
 }
 
 .filter-input:focus {
