@@ -7,7 +7,7 @@ export default function Filter({ filterKey, text, isOpen, isInput, filters, max 
     const [isClicked, setIsClicked] = useState(isOpen);
 
     function handleFilterClick(e) {
-        e.preventDefault();   
+        e.preventDefault();
         setIsClicked(!isClicked);
     }
 
@@ -16,18 +16,18 @@ export default function Filter({ filterKey, text, isOpen, isInput, filters, max 
     }
 
     return (
-        <button ref={filter} className={`filter ${isClicked ? isInput ? "clicked-input" : "clicked" : ""}`} onClick={handleFilterClick}>
-            <div className='filter-text'>
-                {text}
+        <button ref={filter} className={`filter ${isClicked ? "clicked" : ""}`} onClick={handleFilterClick}>
+            <div className='filter-title-container'>
+                <span className='filter-text'>{text}</span>
                 <span className='filter-arrow'>{svgIcons["smallArrow"]}</span>
             </div>
             {isInput ?
-            <div className={`filters-input-container ${isClicked ? '' : 'filters-hidden'}`} onClick={handleFilters} tabIndex="-1">
-                <input type="number" className="filter-input" placeholder='от' />
+            <div className={`filters-input-container ${isClicked ? 'filters-input-show' : 'filters-hidden'}`} onClick={handleFilters} tabIndex="-1">
+                <input type="text" className="filter-input" placeholder='от' />
                 <span className="filter-line" />
-                <input type="number" className="filter-input" placeholder={max} />
+                <input type="text" className="filter-input" placeholder={max} />
             </div> :
-            <div className={`filters ${isClicked ? '' : 'filters-hidden'}`} onClick={handleFilters} tabIndex="-1">
+            <div className={`filters ${isClicked ? 'filters-show' : 'filters-hidden'}`} onClick={handleFilters} tabIndex="-1">
                 {filters.map((prod, index) => {
                     return ( 
                         <label for={filterKey+"|"+index} className='filter-label'>
