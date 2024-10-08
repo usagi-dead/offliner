@@ -1,35 +1,42 @@
 package main
 
 import (
-	"log/slog"
+	"github.com/labstack/echo/v4"
+	"net/http"
 	"os"
 	"server/Iternal/config"
+	storage2 "server/Iternal/storage"
 )
 
 func main() {
+	e := echo.New()
 
 	cfg := config.MustLoad()
 
-	log := SetupLogger(cfg.Env)
-	log.Info("starting offliner server", slog.String("env", cfg.Env))
+	SetupLogger(cfg.Env, e)
+	e.Logger.Info(cfg)
 
-	//TODO: db init
+	storage, err := storage2.New(cfg.DbPath)
+	if err != nil {
+		e.Logger.Fatal(err)
+	}
 
-	//TODO: router init
+	e.Logger.Info(storage.Db.String())
 
-	//TODO: run server
+	e.GET("/", func(c echo.Context) error {
+		return c.String(http.StatusOK, "Hello, World!")
+	})
+
+	e.Logger.Fatal(e.Start(":8080"))
 
 }
 
-func SetupLogger(env string) *slog.Logger {
-	var log *slog.Logger
+func SetupLogger(env string, e *echo.Echo) {
 	switch env {
 	case "local":
-		log = slog.New(
-			slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelDebug}))
+		e.Logger.SetLevel(1)
+		e.Logger.SetOutput(os.Stdout)
 	case "dev":
-		log = slog.New(
-			slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelInfo}))
+		e.Logger.SetLevel(2)
 	}
-	return log
 }

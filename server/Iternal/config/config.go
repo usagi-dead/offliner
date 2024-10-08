@@ -9,7 +9,7 @@ import (
 
 type Config struct {
 	Env        string     `yaml:"env" env-Default:"development"`
-	DbPath     string     `yaml:"db_path" env:"DB_PATH" env-required:"true"`
+	DbPath     DbConfig   `yaml:"db"`
 	HttpServer HttpServer `yaml:"http_server"  env-required:"true"`
 }
 
@@ -17,6 +17,13 @@ type HttpServer struct {
 	Address     string        `yaml:"address" env-required:"true"`
 	Timeout     time.Duration `yaml:"timeout" env-required:"true"`
 	IdleTimeout time.Duration `yaml:"idle_timeout" env-required:"true"`
+}
+
+type DbConfig struct {
+	Username string `yaml:"username"`
+	Address  string `yaml:"address"`
+	DbName   string `yaml:"db_name"`
+	sslmode  string `yaml:"sslmode"`
 }
 
 func MustLoad() *Config {

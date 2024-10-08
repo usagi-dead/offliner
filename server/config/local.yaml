@@ -1,5 +1,9 @@
   env: "local"
-  db_path: "/5324"
+  db:
+    username: "postgres"
+    address: "localhost:5436"
+    dbname: "postgres"
+    sslmode: "disable"
   http_server:
     address: "localhost:8080"
     timeout: 4s
