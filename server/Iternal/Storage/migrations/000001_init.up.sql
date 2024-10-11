@@ -1,15 +1,15 @@
 -- Создание таблицы Users
 CREATE TABLE Users (
-                       user_id SERIAL PRIMARY KEY,
-                       hashed_password VARCHAR(255) NOT NULL,
-                       role VARCHAR(50) NOT NULL,
-                       surname VARCHAR(100) NOT NULL,
-                       name VARCHAR(100) NOT NULL,
-                       patronymic VARCHAR(100),
-                       date_of_birth DATE NOT NULL,
-                       phone_number VARCHAR(15),
-                       email VARCHAR(100) UNIQUE NOT NULL,
-                       gender CHAR(1) CHECK (gender IN ('M', 'F'))
+    user_id SERIAL PRIMARY KEY,
+    hashed_password VARCHAR(255) NOT NULL,
+    role VARCHAR(50) NOT NULL,
+    surname VARCHAR(100) NOT NULL,
+    name VARCHAR(100) NOT NULL,
+    patronymic VARCHAR(100),
+    date_of_birth DATE NOT NULL,
+    phone_number VARCHAR(15),
+    email VARCHAR(100) UNIQUE NOT NULL,
+    gender CHAR(1) CHECK (gender IN ('M', 'F'))
 );
 
 -- Создание таблицы Orders

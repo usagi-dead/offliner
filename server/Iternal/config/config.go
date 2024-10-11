@@ -9,7 +9,7 @@ import (
 
 type Config struct {
 	Env        string     `yaml:"env" env-Default:"development"`
-	DbPath     DbConfig   `yaml:"db"`
+	DbConfig   DbConfig   `yaml:"db"`
 	HttpServer HttpServer `yaml:"http_server"  env-required:"true"`
 }
 
@@ -23,7 +23,7 @@ type DbConfig struct {
 	Username string `yaml:"username"`
 	Address  string `yaml:"address"`
 	DbName   string `yaml:"db_name"`
-	sslmode  string `yaml:"sslmode"`
+	Sslmode  string `yaml:"sslmode"`
 }
 
 func MustLoad() *Config {
