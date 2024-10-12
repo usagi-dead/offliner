@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"log/slog"
@@ -9,6 +10,7 @@ import (
 	"server/Iternal/Storage"
 	"server/Iternal/config"
 	"server/Iternal/http-server/handlers/auth"
+	middleJWT "server/Iternal/http-server/middleware/jwt"
 	middlelog "server/Iternal/http-server/middleware/logger"
 )
 
@@ -32,7 +34,18 @@ func main() {
 	router.Use(middleware.URLFormat)
 
 	router.Post("/sign-up", auth.SignUpHandler(storage, log))
-	//router.Post("/sign-in")
+	router.Post("/sign-in", auth.SignInHandler(storage, log))
+	//router.GET("/refresh-token")
+
+	router.Group(func(r chi.Router) {
+		r.Use(middleJWT.New(log))
+		r.Get("/profile", func(w http.ResponseWriter, r *http.Request) {
+			w.Header().Set("Content-Type", "application/json")
+			json.NewEncoder(w).Encode(map[string]string{
+				"hello": "world!",
+			})
+		})
+	})
 
 	log.Info("server starting", slog.String("Addr", cfg.HttpServer.Address))
 

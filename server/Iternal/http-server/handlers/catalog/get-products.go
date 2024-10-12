@@ -1,4 +1,4 @@
-package get_products
+package catalog
 
 import (
 	"log/slog"

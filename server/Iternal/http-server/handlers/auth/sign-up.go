@@ -11,6 +11,7 @@ import (
 	"server/Iternal/Storage"
 	"server/Iternal/Storage/models"
 	resp "server/Iternal/lib/api/response"
+	"time"
 )
 
 type Request struct {
@@ -70,13 +71,21 @@ func SignUpHandler(signUp SignUp, log *slog.Logger) func(http.ResponseWriter, *h
 			return
 		}
 
+		DateOfBirth, err := time.Parse("2006-01-02", req.DateOfBirth)
+		if err != nil {
+			log.Error("failed to parse date of birth", err)
+			w.WriteHeader(http.StatusInternalServerError)
+			render.JSON(w, r, resp.Error("failed to parse date of birth"))
+			return
+		}
+
 		err = signUp.CreateUser(models.User{
 			Name:           req.Name,
 			Patronymic:     req.Patronymic,
 			Surname:        req.Surname,
 			Email:          req.Email,
 			Gender:         req.Gender,
-			DateOfBirth:    req.DateOfBirth,
+			DateOfBirth:    DateOfBirth,
 			PhoneNumber:    req.PhoneNumber,
 			HashedPassword: string(hashedPassword),
 			Role:           "user",

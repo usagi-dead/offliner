@@ -3,6 +3,8 @@ package Storage
 import (
 	"context"
 	"errors"
+	"fmt"
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"os"
 	"server/Iternal/Storage/models"
@@ -43,4 +45,37 @@ func (s *Storage) CreateUser(user models.User) error {
 		return err
 	}
 	return nil
+}
+
+func (s *Storage) GetUserByEmail(Email string) (*models.User, error) {
+
+	row := s.db.QueryRow(context.Background(),
+		`SELECT * FROM users WHERE email = $1`,
+		Email,
+	)
+
+	user := &models.User{}
+
+	err := row.Scan(
+		&user.UserId,
+		&user.HashedPassword,
+		&user.Role,
+		&user.Surname,
+		&user.Name,
+		&user.Patronymic,
+		&user.DateOfBirth,
+		&user.PhoneNumber,
+		&user.Email,
+		&user.Gender,
+	)
+
+	// Обрабатываем ошибки
+	if err != nil {
+		if err == pgx.ErrNoRows {
+			return nil, fmt.Errorf("user with email %s not found", Email)
+		}
+		return nil, fmt.Errorf("failed to get user by email: %v", err)
+	}
+
+	return user, nil
 }

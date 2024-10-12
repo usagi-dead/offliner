@@ -8,8 +8,9 @@ import (
 )
 
 type Response struct {
-	Status string `json:"status"`
-	Error  string `json:"error,omitempty"`
+	Status      string `json:"status"`
+	Error       string `json:"error,omitempty"`
+	AccessToken string `json:"access_token,omitempty"`
 }
 
 const (
@@ -27,6 +28,13 @@ func Error(msg string) Response {
 	return Response{
 		Status: StatusError,
 		Error:  msg,
+	}
+}
+
+func AccessToken(token string) Response {
+	return Response{
+		Status:      StatusOK,
+		AccessToken: token,
 	}
 }
 
