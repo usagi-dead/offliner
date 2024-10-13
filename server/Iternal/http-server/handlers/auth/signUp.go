@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"server/Iternal/Storage"
 	"server/Iternal/Storage/models"
+	"server/Iternal/lib/api/jwt"
 	resp "server/Iternal/lib/api/response"
 	"time"
 )
@@ -79,7 +80,7 @@ func SignUpHandler(signUp SignUp, log *slog.Logger) func(http.ResponseWriter, *h
 			return
 		}
 
-		err = signUp.CreateUser(models.User{
+		user := models.User{
 			Name:           req.Name,
 			Patronymic:     req.Patronymic,
 			Surname:        req.Surname,
@@ -89,7 +90,8 @@ func SignUpHandler(signUp SignUp, log *slog.Logger) func(http.ResponseWriter, *h
 			PhoneNumber:    req.PhoneNumber,
 			HashedPassword: string(hashedPassword),
 			Role:           "user",
-		})
+		}
+		err = signUp.CreateUser(user)
 		if errors.Is(err, Storage.ErrEmailExists) {
 			log.Info("email already exists", slog.String("email", req.Email))
 			render.JSON(w, r, resp.Error("user with this email already sign-up"))
@@ -102,8 +104,34 @@ func SignUpHandler(signUp SignUp, log *slog.Logger) func(http.ResponseWriter, *h
 			return
 		}
 
+		accessToken, err := jwt.GenerateAccessToken(user.UserId, user.Role)
+		if err != nil {
+			log.Error("failed to generate access token", err)
+			w.WriteHeader(http.StatusInternalServerError)
+			render.JSON(w, r, resp.Error("failed to generate access token"))
+			return
+		}
+
+		refreshToken, err := jwt.GenerateRefreshToken(user.UserId)
+		if err != nil {
+			log.Error("failed to generate refresh token", err)
+			w.WriteHeader(http.StatusInternalServerError)
+			render.JSON(w, r, resp.Error("failed to generate refresh token"))
+			return
+		}
+
 		log.Info("sign up success", slog.String("email", req.Email))
 
-		render.JSON(w, r, resp.OK())
+		http.SetCookie(w, &http.Cookie{
+			Name:     "refresh_token",
+			Value:    refreshToken,
+			Expires:  time.Now().Add(15 * 24 * time.Hour),
+			HttpOnly: true,
+			Path:     "/",
+		})
+
+		w.Header().Set("Content-Type", "application/json")
+
+		render.JSON(w, r, resp.AccessToken(accessToken))
 	}
 }

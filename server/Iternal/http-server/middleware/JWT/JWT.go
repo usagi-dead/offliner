@@ -9,8 +9,9 @@ import (
 
 func New(log *slog.Logger) func(next http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
+		const op string = "jwt-middleware"
 		log = log.With(
-			slog.String("component", "middlewareJWT"),
+			slog.String("op", op),
 		)
 
 		log.Info("middlewareJWT enabled")
@@ -18,13 +19,15 @@ func New(log *slog.Logger) func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			tokenString, err := jwt.ExtractJWTFromHeader(r)
 			if err != nil {
+				log.Error("failed extract access token: %v", r)
 				http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 				return
 			}
 
 			claims, err := jwt.ValidateJWT(tokenString)
 			if err != nil {
-				http.Error(w, "invalid token"+err.Error(), http.StatusUnauthorized)
+				log.Error("invalid token: %v", err.Error())
+				http.Error(w, "invalid token", http.StatusUnauthorized)
 				return
 			}
 

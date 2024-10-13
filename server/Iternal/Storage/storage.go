@@ -71,8 +71,40 @@ func (s *Storage) GetUserByEmail(Email string) (*models.User, error) {
 
 	// Обрабатываем ошибки
 	if err != nil {
-		if err == pgx.ErrNoRows {
+		if errors.Is(err, pgx.ErrNoRows) {
 			return nil, fmt.Errorf("user with email %s not found", Email)
+		}
+		return nil, fmt.Errorf("failed to get user by email: %v", err)
+	}
+
+	return user, nil
+}
+
+func (s *Storage) GetUserById(UserId int64) (*models.User, error) {
+	row := s.db.QueryRow(context.Background(),
+		`SELECT * FROM users WHERE user_id = $1`,
+		UserId,
+	)
+
+	user := &models.User{}
+
+	err := row.Scan(
+		&user.UserId,
+		&user.HashedPassword,
+		&user.Role,
+		&user.Surname,
+		&user.Name,
+		&user.Patronymic,
+		&user.DateOfBirth,
+		&user.PhoneNumber,
+		&user.Email,
+		&user.Gender,
+	)
+
+	// Обрабатываем ошибки
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, fmt.Errorf("user with id %s not found", UserId)
 		}
 		return nil, fmt.Errorf("failed to get user by email: %v", err)
 	}

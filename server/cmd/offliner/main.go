@@ -33,9 +33,11 @@ func main() {
 	router.Use(middleware.Recoverer)
 	router.Use(middleware.URLFormat)
 
-	router.Post("/sign-up", auth.SignUpHandler(storage, log))
-	router.Post("/sign-in", auth.SignInHandler(storage, log))
-	//router.GET("/refresh-token")
+	router.Post("/auth/sign-up", auth.SignUpHandler(storage, log))
+	router.Post("/auth/sign-in", auth.SignInHandler(storage, log))
+	router.Get("/auth/refresh-token", auth.RefreshTokenHandler(storage, log))
+	router.Get("/auth/{provider}", auth.OauthHandler)
+	router.Get("/auth/{provider}/callback", auth.OauthCallbackHandler(log))
 
 	router.Group(func(r chi.Router) {
 		r.Use(middleJWT.New(log))
