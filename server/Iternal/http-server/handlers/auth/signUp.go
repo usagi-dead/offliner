@@ -12,6 +12,7 @@ import (
 	"server/Iternal/Storage/models"
 	"server/Iternal/lib/api/jwt"
 	resp "server/Iternal/lib/api/response"
+	"strconv"
 	"time"
 )
 
@@ -31,7 +32,7 @@ type Response struct {
 }
 
 type SignUp interface {
-	CreateUser(user models.User) error
+	CreateUser(user *models.User) error
 }
 
 var validate = validator.New()
@@ -80,7 +81,7 @@ func SignUpHandler(signUp SignUp, log *slog.Logger) func(http.ResponseWriter, *h
 			return
 		}
 
-		user := models.User{
+		user := &models.User{
 			Name:           req.Name,
 			Patronymic:     req.Patronymic,
 			Surname:        req.Surname,
@@ -92,12 +93,12 @@ func SignUpHandler(signUp SignUp, log *slog.Logger) func(http.ResponseWriter, *h
 			Role:           "user",
 		}
 		err = signUp.CreateUser(user)
-		if errors.Is(err, Storage.ErrEmailExists) {
-			log.Info("email already exists", slog.String("email", req.Email))
-			render.JSON(w, r, resp.Error("user with this email already sign-up"))
-			return
-		}
 		if err != nil {
+			if errors.Is(err, Storage.ErrEmailExists) {
+				log.Info("email already exists", slog.String("email", req.Email))
+				render.JSON(w, r, resp.Error("user with this email already sign-up"))
+				return
+			}
 			log.Error("failed to sign up", err)
 			w.WriteHeader(http.StatusInternalServerError)
 			render.JSON(w, r, resp.Error("failed to sign up"))
@@ -120,7 +121,7 @@ func SignUpHandler(signUp SignUp, log *slog.Logger) func(http.ResponseWriter, *h
 			return
 		}
 
-		log.Info("sign up success", slog.String("email", req.Email))
+		log.Info("sign up success", slog.String("email", req.Email), slog.String("id", strconv.FormatInt(user.UserId, 10)))
 
 		http.SetCookie(w, &http.Cookie{
 			Name:     "refresh_token",

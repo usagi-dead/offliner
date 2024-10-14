@@ -8,8 +8,8 @@ import (
 	"github.com/go-chi/render"
 	"github.com/google/uuid"
 	"golang.org/x/oauth2"
-	"golang.org/x/oauth2/github"
 	"golang.org/x/oauth2/google"
+	"golang.org/x/oauth2/yandex"
 	"log/slog"
 	"net/http"
 	"os"
@@ -23,12 +23,11 @@ var oauthConfigs = map[string]*oauth2.Config{
 		Scopes:       []string{"https://www.googleapis.com/auth/userinfo.email", "https://www.googleapis.com/auth/userinfo.profile"},
 		Endpoint:     google.Endpoint,
 	},
-	"github": &oauth2.Config{
-		ClientID:     os.Getenv("GITHUB_KEY"),
-		ClientSecret: os.Getenv("GITHUB_SECRET"),
-		RedirectURL:  "http://127.0.0.1:8080/auth/github/callback",
-		Scopes:       []string{"user:email"},
-		Endpoint:     github.Endpoint,
+	"ynadex": &oauth2.Config{
+		ClientID:     os.Getenv("YANDEX_KEY"),
+		ClientSecret: os.Getenv("YANDEX_SECRET"),
+		RedirectURL:  "http://127.0.0.1:8080/auth/ynadex/callback",
+		Endpoint:     yandex.Endpoint,
 	},
 }
 
@@ -51,7 +50,7 @@ func OauthHandler(w http.ResponseWriter, r *http.Request) {
 
 	state := generateStateToken()
 	//перенаправление на сторону провайдера
-	url := config.AuthCodeURL(state, oauth2.AccessTypeOnline)
+	url := config.AuthCodeURL(state, oauth2.AccessTypeOnline) + "&c"
 	http.Redirect(w, r, url, http.StatusTemporaryRedirect)
 }
 
@@ -86,6 +85,7 @@ func OauthCallbackHandler(log *slog.Logger) func(w http.ResponseWriter, r *http.
 		client := config.Client(context.Background(), token)
 		userInfo, err := fetchUserInfo(client, provider)
 		if err != nil {
+			log.Error("Failed to fetch user info: " + err.Error())
 			http.Error(w, "Failed to get user info", http.StatusBadRequest)
 			return
 		}
@@ -100,10 +100,10 @@ func fetchUserInfo(client *http.Client, provider string) (map[string]interface{}
 	switch provider {
 	case "google":
 		url = "https://www.googleapis.com/oauth2/v3/userinfo"
-	case "github":
-		url = "https://api.github.com/user"
+	case "ynadex":
+		url = "https://login.yandex.ru/info?format=json"
 	default:
-		return nil, fmt.Errorf("unknown provider: %s", provider)
+		return nil, fmt.Errorf("unknown provider: %v", provider)
 	}
 
 	resp, err := client.Get(url)

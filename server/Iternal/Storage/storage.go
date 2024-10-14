@@ -32,11 +32,12 @@ func New(cfg config.DbConfig) (*Storage, error) {
 	return &Storage{db: pool}, nil
 }
 
-func (s *Storage) CreateUser(user models.User) error {
-	_, err := s.db.Exec(context.Background(),
+func (s *Storage) CreateUser(user *models.User) error {
+	err := s.db.QueryRow(context.Background(),
 		`INSERT INTO users (hashed_password, surname, name, patronymic, date_of_birth, phone_number, email, gender, role)
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
-		user.HashedPassword, user.Surname, user.Name, user.Patronymic, user.DateOfBirth, user.PhoneNumber, user.Email, user.Gender, user.Role)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) 
+        RETURNING user_id`,
+		user.HashedPassword, user.Surname, user.Name, user.Patronymic, user.DateOfBirth, user.PhoneNumber, user.Email, user.Gender, user.Role).Scan(&user.UserId)
 
 	if err != nil {
 		if err.Error() == `ERROR: duplicate key value violates unique constraint "users_email_key" (SQLSTATE 23505)` {
@@ -104,7 +105,7 @@ func (s *Storage) GetUserById(UserId int64) (*models.User, error) {
 	// Обрабатываем ошибки
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			return nil, fmt.Errorf("user with id %s not found", UserId)
+			return nil, fmt.Errorf("user with id %v not found", UserId)
 		}
 		return nil, fmt.Errorf("failed to get user by email: %v", err)
 	}
