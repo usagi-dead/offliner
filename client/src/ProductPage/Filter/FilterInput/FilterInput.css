@@ -1,0 +1,52 @@
+.filters-input-container {
+    outline: 1px solid var(--main-color);
+    flex: 1;
+    width: calc(100% - 32px);
+    display: flex;
+    justify-content: center;
+    gap: 5px;
+    padding: 0px 16px;
+    border-radius: var(--border-radius);
+    transition: height 0.3s, max-height 0.3s, outline 0.3s;
+}
+
+.filters-input-container:hover {
+    --second-color: var(--accent-color);
+}
+
+.filters-input-show {
+    height: 42px;
+    max-height: 42px;
+}
+
+.filters-input-show input.filter-input {
+    height: 40px;
+}
+
+.filters-hidden {
+    max-height: 0px;
+    pointer-events: none;
+}
+
+.filter-input {
+    font-family: 'Montserrat';
+    max-width: 46%;
+    border: none;
+    outline: none;
+    padding: 0px;
+    height: 0px;
+    background-color: var(--main-color);
+    transition: background-color 0.3s, height 0.3s;
+    color: var(--text-color);
+}
+
+.filter-input:focus {
+    outline: none;
+}
+
+.filter-line {
+    height: 100%;
+    min-width: 1px;
+    background-color: var(--second-color);
+    transition: background-color 0.3s;
+}
