@@ -5,9 +5,9 @@ import (
 	"github.com/go-chi/render"
 	"log/slog"
 	"net/http"
-	"server/Iternal/Storage/models"
 	"server/Iternal/lib/api/jwt"
 	resp "server/Iternal/lib/api/response"
+	"server/Iternal/storage/models"
 )
 
 type refreshAccessTokenResponse struct {

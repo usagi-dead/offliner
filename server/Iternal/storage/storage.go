@@ -1,4 +1,4 @@
-package Storage
+package storage
 
 import (
 	"context"
@@ -7,8 +7,8 @@ import (
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"os"
-	"server/Iternal/Storage/models"
 	"server/Iternal/config"
+	"server/Iternal/storage/models"
 )
 
 var (
@@ -33,6 +33,9 @@ func New(cfg config.DbConfig) (*Storage, error) {
 }
 
 func (s *Storage) CreateUser(user *models.User) error {
+	//err := s.db.QueryRow(context.Background(),
+	//	`INSERT INTO `)
+
 	err := s.db.QueryRow(context.Background(),
 		`INSERT INTO users (hashed_password, surname, name, patronymic, date_of_birth, phone_number, email, gender, role)
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) 

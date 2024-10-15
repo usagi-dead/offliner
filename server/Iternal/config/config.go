@@ -8,12 +8,19 @@ import (
 )
 
 type Config struct {
-	Env        string     `yaml:"env" env-Default:"development"`
-	DbConfig   DbConfig   `yaml:"db"`
-	HttpServer HttpServer `yaml:"http_server"  env-required:"true"`
+	Env              string           `yaml:"env" env-Default:"development"`
+	DbConfig         DbConfig         `yaml:"db"`
+	HttpServerConfig HttpServerConfig `yaml:"http_server"  env-required:"true"`
+	CacheConfig      CacheConfig      `yaml:"cache"`
 }
 
-type HttpServer struct {
+type CacheConfig struct {
+	Address         string        `yaml:"address" env-required:"true"`
+	Db              int           `yaml:"db"`
+	StateExpiration time.Duration `yaml:"state_expiration" env-required:"true"`
+}
+
+type HttpServerConfig struct {
 	Address     string        `yaml:"address" env-required:"true"`
 	Timeout     time.Duration `yaml:"timeout" env-required:"true"`
 	IdleTimeout time.Duration `yaml:"idle_timeout" env-required:"true"`

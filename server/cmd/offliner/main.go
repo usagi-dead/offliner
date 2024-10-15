@@ -1,69 +1,132 @@
 package main
 
 import (
-	"encoding/json"
+	"context"
+	"errors"
+	"fmt"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"log/slog"
 	"net/http"
 	"os"
-	"server/Iternal/Storage"
+	"os/signal"
+	"server/Iternal/cache"
 	"server/Iternal/config"
 	"server/Iternal/http-server/handlers/auth"
 	middleJWT "server/Iternal/http-server/middleware/jwt"
 	middlelog "server/Iternal/http-server/middleware/logger"
+	"server/Iternal/lib/emailsender"
+	"server/Iternal/storage"
+	"syscall"
+	"time"
 )
 
-func main() {
+type App struct {
+	Storage     *storage.Storage
+	Cache       *cache.Cache
+	EmailSender *emailsender.EmailSender
+	Router      chi.Router
+	Log         *slog.Logger
+	Cfg         *config.Config
+}
 
-	cfg := config.MustLoad()
-
-	log := SetupLogger(cfg.Env)
-
-	storage, err := Storage.New(cfg.DbConfig)
+func NewApp(cfg *config.Config, log *slog.Logger) (*App, error) {
+	Storage, err := storage.New(cfg.DbConfig)
 	if err != nil {
-		log.Error("db init field: " + err.Error())
-		os.Exit(1)
+		return nil, fmt.Errorf("db init failed: %w", err)
+	}
+
+	Cache, err := cache.New(cfg.CacheConfig)
+	if err != nil {
+		return nil, fmt.Errorf("cache init failed: %w", err)
+	}
+
+	eSender, err := emailsender.New()
+	if err != nil {
+		return nil, fmt.Errorf("email sender init failed: %w", err)
 	}
 
 	router := chi.NewRouter()
+	return &App{Storage: Storage, Cache: Cache, EmailSender: eSender, Router: router, Log: log, Cfg: cfg}, nil
+}
 
-	router.Use(middleware.RequestID)
-	router.Use(middlelog.New(log))
-	router.Use(middleware.Recoverer)
-	router.Use(middleware.URLFormat)
+func (app *App) Start() error {
+	srv := &http.Server{
+		Addr:         app.Cfg.HttpServerConfig.Address,
+		Handler:      app.Router,
+		ReadTimeout:  app.Cfg.HttpServerConfig.Timeout,
+		WriteTimeout: app.Cfg.HttpServerConfig.Timeout,
+		IdleTimeout:  app.Cfg.HttpServerConfig.IdleTimeout,
+	}
 
-	router.Post("/auth/sign-up", auth.SignUpHandler(storage, log))
-	router.Post("/auth/sign-in", auth.SignInHandler(storage, log))
-	router.Get("/auth/refresh-token", auth.RefreshTokenHandler(storage, log))
-	router.Get("/auth/{provider}", auth.OauthHandler)
-	router.Get("/auth/{provider}/callback", auth.OauthCallbackHandler(log))
+	go func() {
+		if err := srv.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
+			app.Log.Error("server error", slog.String("error", err.Error()))
+		}
+	}()
 
-	router.Group(func(r chi.Router) {
-		r.Use(middleJWT.New(log))
-		r.Get("/profile", func(w http.ResponseWriter, r *http.Request) {
-			w.Header().Set("Content-Type", "application/json")
-			json.NewEncoder(w).Encode(map[string]string{
-				"hello": "world!",
-			})
-		})
+	app.Log.Info("server started", slog.String("Addr", app.Cfg.HttpServerConfig.Address))
+
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+
+	<-quit
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	if err := srv.Shutdown(ctx); err != nil {
+		return fmt.Errorf("server shutdown failed: %w", err)
+	}
+
+	app.Log.Info("server stopped gracefully")
+	return nil
+}
+
+func (app *App) SetupRoutes() {
+	app.Router.Use(middleware.RequestID)
+	app.Router.Use(middlelog.New(app.Log))
+	app.Router.Use(middleware.Recoverer)
+	app.Router.Use(middleware.URLFormat)
+
+	// Группа для аунтификации
+	app.Router.Route("/auth", func(r chi.Router) {
+		r.Post("/sign-up", auth.SignUpHandler(app.Storage, app.Log))
+		r.Post("/sign-in", auth.SignInHandler(app.Storage, app.Log))
+		r.Get("/refresh-token", auth.RefreshTokenHandler(app.Storage, app.Log))
+		r.Get("/{provider}", auth.OauthHandler(app.Cache, app.Log))
+		r.Get("/{provider}/callback", auth.OauthCallbackHandler(app.Cache, app.Log))
 	})
 
-	log.Info("server starting", slog.String("Addr", cfg.HttpServer.Address))
+	// Группа для пользовательских маршрутов (требует авторизации)
+	app.Router.Group(func(r chi.Router) {
+		r.Use(middleJWT.New(app.Log))
+		// r.Get("/profile", app.profileHandler)
+	})
 
-	srv := &http.Server{
-		Addr:         cfg.HttpServer.Address,
-		Handler:      router,
-		ReadTimeout:  cfg.HttpServer.Timeout,
-		WriteTimeout: cfg.HttpServer.Timeout,
-		IdleTimeout:  cfg.HttpServer.IdleTimeout,
+	// Группа для административных маршрутов
+	app.Router.Route("/admin", func(r chi.Router) {
+		r.Use(middleJWT.New(app.Log))
+		//r.Use(middleAdmin)
+	})
+}
+
+func main() {
+	cfg := config.MustLoad()
+	log := SetupLogger(cfg.Env)
+
+	app, err := NewApp(cfg, log)
+	if err != nil {
+		log.Error("app init failed", slog.String("error", err.Error()))
+		os.Exit(1)
 	}
 
-	if err = srv.ListenAndServe(); err != nil {
-		log.Error("http server error: " + err.Error())
-	}
+	app.SetupRoutes()
 
-	log.Info("server stopped")
+	if err := app.Start(); err != nil {
+		log.Error("server error", slog.String("error", err.Error()))
+		os.Exit(1)
+	}
 }
 
 func SetupLogger(env string) (log *slog.Logger) {

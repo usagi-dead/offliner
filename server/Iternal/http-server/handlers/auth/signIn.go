@@ -7,9 +7,9 @@ import (
 	"golang.org/x/crypto/bcrypt"
 	"log/slog"
 	"net/http"
-	"server/Iternal/Storage/models"
 	"server/Iternal/lib/api/jwt"
 	resp "server/Iternal/lib/api/response"
+	"server/Iternal/storage/models"
 	"time"
 )
 

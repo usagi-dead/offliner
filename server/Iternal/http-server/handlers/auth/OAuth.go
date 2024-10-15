@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
-	"github.com/google/uuid"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
 	"golang.org/x/oauth2/yandex"
@@ -14,6 +13,12 @@ import (
 	"net/http"
 	"os"
 )
+
+type StateGenerator interface {
+	CreateStateCode() (string, error)
+	GetStateCode(stateToken string) (bool, error)
+	DeleteStateCode(stateToken string) error
+}
 
 var oauthConfigs = map[string]*oauth2.Config{
 	"google": &oauth2.Config{
@@ -23,44 +28,46 @@ var oauthConfigs = map[string]*oauth2.Config{
 		Scopes:       []string{"https://www.googleapis.com/auth/userinfo.email", "https://www.googleapis.com/auth/userinfo.profile"},
 		Endpoint:     google.Endpoint,
 	},
-	"ynadex": &oauth2.Config{
+	"yandex": &oauth2.Config{
 		ClientID:     os.Getenv("YANDEX_KEY"),
 		ClientSecret: os.Getenv("YANDEX_SECRET"),
-		RedirectURL:  "http://127.0.0.1:8080/auth/ynadex/callback",
+		RedirectURL:  "http://127.0.0.1:8080/auth/yandex/callback",
 		Endpoint:     yandex.Endpoint,
 	},
 }
 
-var stateStore = map[string]bool{}
+func OauthHandler(sg StateGenerator, log *slog.Logger) func(w http.ResponseWriter, r *http.Request) {
+	log = log.With("op", "OauthHandler")
+	return func(w http.ResponseWriter, r *http.Request) {
+		provider := chi.URLParam(r, "provider")
 
-func generateStateToken() (stateToken string) {
-	stateToken = uuid.NewString()
-	stateStore[stateToken] = true
-	return
-}
+		config, ok := oauthConfigs[provider]
+		if !ok {
+			log.Error("not supported provider: " + provider)
+			http.Error(w, "provider not supported", http.StatusNotFound)
+			return
+		}
 
-func OauthHandler(w http.ResponseWriter, r *http.Request) {
-	provider := chi.URLParam(r, "provider")
-
-	config, ok := oauthConfigs[provider]
-	if !ok {
-		http.Error(w, "provider not supported", http.StatusNotFound)
-		return
+		state, err := sg.CreateStateCode()
+		if err != nil {
+			log.Error("error generating state token: " + err.Error())
+			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+			return
+		}
+		//перенаправление на сторону провайдера
+		url := config.AuthCodeURL(state, oauth2.AccessTypeOnline)
+		http.Redirect(w, r, url, http.StatusTemporaryRedirect)
 	}
-
-	state := generateStateToken()
-	//перенаправление на сторону провайдера
-	url := config.AuthCodeURL(state, oauth2.AccessTypeOnline) + "&c"
-	http.Redirect(w, r, url, http.StatusTemporaryRedirect)
 }
 
-func OauthCallbackHandler(log *slog.Logger) func(w http.ResponseWriter, r *http.Request) {
+func OauthCallbackHandler(sg StateGenerator, log *slog.Logger) func(w http.ResponseWriter, r *http.Request) {
 	log = log.With("op", "OauthCallbackHandler")
 	return func(w http.ResponseWriter, r *http.Request) {
 		provider := chi.URLParam(r, "provider")
 
 		config, ok := oauthConfigs[provider]
 		if !ok {
+			log.Error("not supported provider: " + provider)
 			http.Error(w, "provider not supported", http.StatusNotFound)
 			return
 		}
@@ -68,12 +75,22 @@ func OauthCallbackHandler(log *slog.Logger) func(w http.ResponseWriter, r *http.
 		state := r.URL.Query().Get("state")
 		code := r.URL.Query().Get("code")
 
-		if !stateStore[state] {
+		ok, err := sg.GetStateCode(state)
+		if err != nil {
+			log.Error("error getting state: " + err.Error())
+			http.Error(w, "invalid state", http.StatusBadRequest)
+			return
+		}
+		if !ok {
 			http.Error(w, "invalid state", http.StatusBadRequest)
 			return
 		}
 
-		delete(stateStore, state)
+		if err := sg.DeleteStateCode(state); err != nil {
+			log.Error("error deleting state: " + err.Error())
+			http.Error(w, "invalid state", http.StatusBadRequest)
+			return
+		}
 
 		token, err := config.Exchange(context.Background(), code)
 		if err != nil {
@@ -100,7 +117,7 @@ func fetchUserInfo(client *http.Client, provider string) (map[string]interface{}
 	switch provider {
 	case "google":
 		url = "https://www.googleapis.com/oauth2/v3/userinfo"
-	case "ynadex":
+	case "yandex":
 		url = "https://login.yandex.ru/info?format=json"
 	default:
 		return nil, fmt.Errorf("unknown provider: %v", provider)

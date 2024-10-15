@@ -8,10 +8,10 @@ import (
 	"golang.org/x/crypto/bcrypt"
 	"log/slog"
 	"net/http"
-	"server/Iternal/Storage"
-	"server/Iternal/Storage/models"
 	"server/Iternal/lib/api/jwt"
 	resp "server/Iternal/lib/api/response"
+	"server/Iternal/storage"
+	"server/Iternal/storage/models"
 	"strconv"
 	"time"
 )
@@ -94,7 +94,7 @@ func SignUpHandler(signUp SignUp, log *slog.Logger) func(http.ResponseWriter, *h
 		}
 		err = signUp.CreateUser(user)
 		if err != nil {
-			if errors.Is(err, Storage.ErrEmailExists) {
+			if errors.Is(err, storage.ErrEmailExists) {
 				log.Info("email already exists", slog.String("email", req.Email))
 				render.JSON(w, r, resp.Error("user with this email already sign-up"))
 				return
