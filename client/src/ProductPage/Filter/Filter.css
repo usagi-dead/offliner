@@ -33,7 +33,7 @@
     transition: color 0.3s, border 0.3s, height 0.3s ease-in-out;
     width: 300px;
     gap: 0px;
-    transition: gap 0.3s;
+    transition: gap 0.3s, border 0.3s;
 }
 
 .filter-arrow {
@@ -50,8 +50,4 @@
 .clicked {
     gap: 20px;
     --rotate: 90deg;
-}
-
-.filter.clicked .filters-input-container {
-    outline: 1px solid var(--second-color);
 }
