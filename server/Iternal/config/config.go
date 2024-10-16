@@ -15,9 +15,10 @@ type Config struct {
 }
 
 type CacheConfig struct {
-	Address         string        `yaml:"address" env-required:"true"`
-	Db              int           `yaml:"db"`
-	StateExpiration time.Duration `yaml:"state_expiration" env-required:"true"`
+	Address                      string        `yaml:"address" env-required:"true"`
+	Db                           int           `yaml:"db"`
+	StateExpiration              time.Duration `yaml:"state_expiration" env-required:"true"`
+	EmailConfirmedCodeExpiration time.Duration `yaml:"email_confirmed_code_expiration" env-required:"true"`
 }
 
 type HttpServerConfig struct {

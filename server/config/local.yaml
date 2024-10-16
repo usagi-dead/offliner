@@ -12,3 +12,4 @@ cache:
     address: "localhost:6379"
     db: 0
     state_expiration: 7m
+    email_confirmed_code_expiration: 3m

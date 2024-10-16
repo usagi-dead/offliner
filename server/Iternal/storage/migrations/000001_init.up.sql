@@ -1,14 +1,7 @@
-CREATE TABLE EmailСonfirmation (
-    email_confirmation_id SERIAL PRIMARY KEY,
-    confirmation_code INT NOT NULL,
-    confirmation BOOLEAN DEFAULT FALSE,
-    expiration_date DATE NOT NULL
-);
-
+CREATE TYPE email_status AS ENUM ('confirmed', 'not confirmed');
 -- Создание таблицы Users
 CREATE TABLE Users (
     user_id SERIAL PRIMARY KEY,
-    email_confirmation_id INT REFERENCES EmailСonfirmation(email_confirmation_id) ON DELETE CASCADE ON UPDATE CASCADE,
     hashed_password VARCHAR(255) NOT NULL,
     role VARCHAR(50) NOT NULL,
     surname VARCHAR(100) NOT NULL,
@@ -17,6 +10,8 @@ CREATE TABLE Users (
     date_of_birth DATE NOT NULL,
     phone_number VARCHAR(15),
     email VARCHAR(100) UNIQUE NOT NULL,
+    avatar_url VARCHAR(255) NOT NULL DEFAULT '',
+    status_email email_status NOT NULL DEFAULT 'not confirmed',
     gender CHAR(1) CHECK (gender IN ('M', 'F'))
 );
 

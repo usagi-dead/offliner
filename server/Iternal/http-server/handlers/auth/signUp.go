@@ -8,7 +8,6 @@ import (
 	"golang.org/x/crypto/bcrypt"
 	"log/slog"
 	"net/http"
-	"server/Iternal/lib/api/jwt"
 	resp "server/Iternal/lib/api/response"
 	"server/Iternal/storage"
 	"server/Iternal/storage/models"
@@ -35,9 +34,18 @@ type SignUp interface {
 	CreateUser(user *models.User) error
 }
 
+type EmailConfirmation interface {
+	CreateEmailConfirmedCode(email string) (string, error)
+	GetEmailConfirmedCode(email string) (string, error)
+}
+
+type EmailSend interface {
+	SendConfirmEmail(code string, email string) error
+}
+
 var validate = validator.New()
 
-func SignUpHandler(signUp SignUp, log *slog.Logger) func(http.ResponseWriter, *http.Request) {
+func SignUpHandler(es EmailSend, ec EmailConfirmation, signUp SignUp, log *slog.Logger) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		const op = "SignUpHandler"
 
@@ -93,6 +101,7 @@ func SignUpHandler(signUp SignUp, log *slog.Logger) func(http.ResponseWriter, *h
 			Role:           "user",
 		}
 		err = signUp.CreateUser(user)
+
 		if err != nil {
 			if errors.Is(err, storage.ErrEmailExists) {
 				log.Info("email already exists", slog.String("email", req.Email))
@@ -105,34 +114,21 @@ func SignUpHandler(signUp SignUp, log *slog.Logger) func(http.ResponseWriter, *h
 			return
 		}
 
-		accessToken, err := jwt.GenerateAccessToken(user.UserId, user.Role)
+		code, err := ec.CreateEmailConfirmedCode(user.Email)
 		if err != nil {
-			log.Error("failed to generate access token", err)
+			log.Error("failed to create email confirmed code", err)
 			w.WriteHeader(http.StatusInternalServerError)
-			render.JSON(w, r, resp.Error("failed to generate access token"))
-			return
+			render.JSON(w, r, resp.Error("failed to create email confirmed code"))
 		}
 
-		refreshToken, err := jwt.GenerateRefreshToken(user.UserId)
-		if err != nil {
-			log.Error("failed to generate refresh token", err)
+		if err = es.SendConfirmEmail(code, user.Email); err != nil {
+			log.Error("failed to send email confirmed code", err)
 			w.WriteHeader(http.StatusInternalServerError)
-			render.JSON(w, r, resp.Error("failed to generate refresh token"))
-			return
+			render.JSON(w, r, resp.Error("failed to send email confirmed code"))
 		}
 
 		log.Info("sign up success", slog.String("email", req.Email), slog.String("id", strconv.FormatInt(user.UserId, 10)))
-
-		http.SetCookie(w, &http.Cookie{
-			Name:     "refresh_token",
-			Value:    refreshToken,
-			Expires:  time.Now().Add(15 * 24 * time.Hour),
-			HttpOnly: true,
-			Path:     "/",
-		})
-
-		w.Header().Set("Content-Type", "application/json")
-
-		render.JSON(w, r, resp.AccessToken(accessToken))
+		w.WriteHeader(http.StatusCreated)
+		render.JSON(w, r, resp.OK())
 	}
 }

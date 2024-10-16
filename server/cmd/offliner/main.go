@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/go-chi/render"
 	"log/slog"
 	"net/http"
 	"os"
@@ -13,8 +14,10 @@ import (
 	"server/Iternal/cache"
 	"server/Iternal/config"
 	"server/Iternal/http-server/handlers/auth"
+	"server/Iternal/http-server/middleware/emailConfirmed"
 	middleJWT "server/Iternal/http-server/middleware/jwt"
 	middlelog "server/Iternal/http-server/middleware/logger"
+	resp "server/Iternal/lib/api/response"
 	"server/Iternal/lib/emailsender"
 	"server/Iternal/storage"
 	"syscall"
@@ -91,8 +94,10 @@ func (app *App) SetupRoutes() {
 
 	// Группа для аунтификации
 	app.Router.Route("/auth", func(r chi.Router) {
-		r.Post("/sign-up", auth.SignUpHandler(app.Storage, app.Log))
+		r.Post("/sign-up", auth.SignUpHandler(app.EmailSender, app.Cache, app.Storage, app.Log))
 		r.Post("/sign-in", auth.SignInHandler(app.Storage, app.Log))
+		r.Post("/confirmed-email", auth.EmailConfirmedHandler(app.Cache, app.Storage, app.Log))
+		//r.Post("/complete-profile", auth.CompleteProfileHandler(app.Storage, app.Log))
 		r.Get("/refresh-token", auth.RefreshTokenHandler(app.Storage, app.Log))
 		r.Get("/{provider}", auth.OauthHandler(app.Cache, app.Log))
 		r.Get("/{provider}/callback", auth.OauthCallbackHandler(app.Cache, app.Log))
@@ -101,13 +106,25 @@ func (app *App) SetupRoutes() {
 	// Группа для пользовательских маршрутов (требует авторизации)
 	app.Router.Group(func(r chi.Router) {
 		r.Use(middleJWT.New(app.Log))
-		// r.Get("/profile", app.profileHandler)
+		r.Use(emailConfirmed.New(app.Storage, app.Log))
+		r.Get("/profile", func(w http.ResponseWriter, r *http.Request) {
+			w.WriteHeader(http.StatusCreated)
+			render.JSON(w, r, resp.OK())
+		})
 	})
 
 	// Группа для административных маршрутов
 	app.Router.Route("/admin", func(r chi.Router) {
 		r.Use(middleJWT.New(app.Log))
 		//r.Use(middleAdmin)
+	})
+
+	//Группа маршутов для супперадминов для создание админов
+	app.Router.Group(func(r chi.Router) {
+		r.Use(middleJWT.New(app.Log))
+		//r.Use(WhiteIpList(WhiteList)
+		//r.Use(middleSuperAdmin)
+		//r.Post("/admin/create", auth.CrateAdminHandler(app.Storage, app.Log))
 	})
 }
 

@@ -5,6 +5,7 @@ import (
 	"log/slog"
 	"net/http"
 	"server/Iternal/lib/api/jwt"
+	ck "server/Iternal/lib/contextKeys"
 )
 
 func New(log *slog.Logger) func(next http.Handler) http.Handler {
@@ -31,10 +32,11 @@ func New(log *slog.Logger) func(next http.Handler) http.Handler {
 				return
 			}
 
-			ctx := context.WithValue(r.Context(), "user_id", claims.UserId)
-			ctx = context.WithValue(r.Context(), "role", claims.Role)
+			ctx := context.WithValue(r.Context(), ck.UserIDKey, claims.UserId)
+			ctx = context.WithValue(ctx, ck.RoleKey, claims.Role)
+			r = r.WithContext(ctx)
 
-			next.ServeHTTP(w, r.WithContext(ctx))
+			next.ServeHTTP(w, r)
 		})
 	}
 }

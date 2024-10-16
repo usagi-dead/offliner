@@ -12,7 +12,8 @@ import (
 )
 
 var (
-	ErrEmailExists = errors.New("users_email_key")
+	ErrEmailExists    = errors.New("users_email_key")
+	ErrEmailNotExists = errors.New("user_email_not_exists")
 )
 
 type Storage struct {
@@ -33,9 +34,6 @@ func New(cfg config.DbConfig) (*Storage, error) {
 }
 
 func (s *Storage) CreateUser(user *models.User) error {
-	//err := s.db.QueryRow(context.Background(),
-	//	`INSERT INTO `)
-
 	err := s.db.QueryRow(context.Background(),
 		`INSERT INTO users (hashed_password, surname, name, patronymic, date_of_birth, phone_number, email, gender, role)
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) 
@@ -70,6 +68,8 @@ func (s *Storage) GetUserByEmail(Email string) (*models.User, error) {
 		&user.DateOfBirth,
 		&user.PhoneNumber,
 		&user.Email,
+		&user.AvatarUrl,
+		&user.EmailStatus,
 		&user.Gender,
 	)
 
@@ -110,8 +110,42 @@ func (s *Storage) GetUserById(UserId int64) (*models.User, error) {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return nil, fmt.Errorf("user with id %v not found", UserId)
 		}
-		return nil, fmt.Errorf("failed to get user by email: %v", err)
+		return nil, fmt.Errorf("failed to get user: %v", err)
 	}
 
 	return user, nil
+}
+
+func (s *Storage) IsEmailConfirmed(UserId int64) (bool, error) {
+	row := s.db.QueryRow(context.Background(),
+		`SELECT status_email FROM users WHERE user_id = $1`,
+		UserId,
+	)
+
+	var EmailStatus string
+	err := row.Scan(&EmailStatus)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return false, fmt.Errorf("user with id %v not found", UserId)
+		}
+		return false, fmt.Errorf("failed to get user: %v", err)
+	}
+
+	return EmailStatus == "confirmed", nil
+}
+
+func (s *Storage) UpdateEmailStatus(Email string) error {
+	_, err := s.db.Exec(context.Background(),
+		`UPDATE users SET status_email = 'confirmed' WHERE email = $1`,
+		Email,
+	)
+
+	if err != nil {
+		if err.Error() == `ERROR: duplicate key value violates unique constraint "users_email_key" (SQLSTATE 23505)` {
+			return ErrEmailNotExists
+		}
+		return err
+	}
+
+	return nil
 }

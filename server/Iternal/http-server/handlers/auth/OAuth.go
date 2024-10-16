@@ -17,7 +17,6 @@ import (
 type StateGenerator interface {
 	CreateStateCode() (string, error)
 	GetStateCode(stateToken string) (bool, error)
-	DeleteStateCode(stateToken string) error
 }
 
 var oauthConfigs = map[string]*oauth2.Config{
@@ -82,12 +81,6 @@ func OauthCallbackHandler(sg StateGenerator, log *slog.Logger) func(w http.Respo
 			return
 		}
 		if !ok {
-			http.Error(w, "invalid state", http.StatusBadRequest)
-			return
-		}
-
-		if err := sg.DeleteStateCode(state); err != nil {
-			log.Error("error deleting state: " + err.Error())
 			http.Error(w, "invalid state", http.StatusBadRequest)
 			return
 		}
