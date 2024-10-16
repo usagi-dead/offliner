@@ -2,7 +2,7 @@ import './SearchResultsCard.css';
 import React from 'react';
 import { Link } from 'react-router-dom';
 
-export default function SearchResults({ item, index }) {
+export default function SearchResults({ item, index, isLast }) {
     return (
         <div className='relative'>
             <li key={index} className="search-result-item">
@@ -25,7 +25,7 @@ export default function SearchResults({ item, index }) {
                     </div>
                 </Link>
             </li>
-            <div className='search-line'></div>
+            {!isLast && <div className='search-line'></div>}
         </div>
     );
 }

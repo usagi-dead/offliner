@@ -12,8 +12,8 @@
     --second-color: #D9D9D9;
     --accent-color: #025ADD;
     --second-accent-color: #EEF3FB;
-    --shadow: rgba(0, 0, 0, 0.2);
-    --extra-shadow: rgba(0, 0, 0, 0.3);
+    --shadow: rgba(0, 0, 0, 0.1);
+    --extra-shadow: rgba(0, 0, 0, 0.2);
     --primary-color: black;
 }
 

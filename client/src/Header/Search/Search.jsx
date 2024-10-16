@@ -56,14 +56,15 @@ export default function Search() {
                     searchTerm={searchTerm} 
                     onChange={handleSearchChange} 
                     onKeyDown={handleKeyDown} 
+                    background={searchResults.length > 0 ? " filled" : ""}
                 />
-                <SearchButton onClick={handleSearch} />
+                <SearchButton onClick={handleSearch} background={searchResults.length > 0 ? " filled" : ""} />
             </div>
 
             {searchResults.length > 0 && (
                 <>
-                    <SearchResults results={searchResults} onClose={handleSearchClose} />
-                    <div className="overlay"></div>
+                    <SearchResults results={searchResults} />
+                    <div className="overlay"  onClick={handleSearchClose}></div>
                 </>
             )}
         </>

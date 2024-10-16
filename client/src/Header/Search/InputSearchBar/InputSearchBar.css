@@ -19,3 +19,7 @@
     --second-color: var(--accent-color);
     outline: none;
 }
+
+.filled {
+    background-color: var(--main-color);
+}

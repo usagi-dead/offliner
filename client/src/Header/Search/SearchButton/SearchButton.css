@@ -17,3 +17,7 @@
 .search:hover .search-button:hover svg {
     --text-color: var(--accent-color);
 }
+
+.filled {
+    background-color: var(--main-color);
+}

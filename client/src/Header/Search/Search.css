@@ -14,7 +14,8 @@
     top: -18px;
     left: 0px;
     width: 100%;
-    height: calc(100vh + 18px);
+    height: calc(100vh + 19px);
+    backdrop-filter: blur(20px);
     background-color: rgba(0, 0, 0, 0.5);
     z-index: 1;
 }
