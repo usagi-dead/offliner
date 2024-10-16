@@ -6,7 +6,8 @@
     gap: 5px;
     padding: 0px 16px;
     border-radius: var(--border-radius);
-    outline: 1px solid var(--second-color);
+    outline: 1px solid var(--second-accent-color);
+    --second-accent-color: var(--main-color);
     transition: height 0.3s, max-height 0.3s, outline 0.3s;
 }
 
@@ -17,6 +18,7 @@
 .filters-input-show {
     height: 42px;
     max-height: 42px;
+    --second-accent-color: var(--second-color);
 }
 
 .filters-input-show input.filter-input {
@@ -42,14 +44,6 @@
 
 .filter-input:focus {
     outline: none;
-}
-
-.filter-input:focus .filters-input-container {
-    outline: 1px solid var(--accent-color);
-}
-
-.filter-input:focus ~ .filter-line {
-    background-color: var(--accent-color);
 }
 
 .filter-line {
