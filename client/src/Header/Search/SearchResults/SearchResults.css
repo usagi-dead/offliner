@@ -9,6 +9,7 @@
     border-radius: var(--border-radius);
     border: 1px solid var(--second-color);
     transition: background-color 0.3s, border-color 0.3s, box-shadow 0.3s;
+    animation: search-in 0.3s;
 }
 
 .search-results {
@@ -30,4 +31,12 @@
 .search-padding {
     min-height: var(--container-padding);
     width: 100%;
+}
+
+@keyframes search-in {
+    from {
+        opacity: 0;
+    } to {
+        opacity: 1;
+    }
 }

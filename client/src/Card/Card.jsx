@@ -20,7 +20,7 @@ export default function Card({ product }) {
                     <div className={classes.discount}>{discount}</div>
                 )}
 
-                <Specs specs={specs} textSize="16" />
+                <Specs specs={specs} textSize="16" lineNum={3} />
 
                 <div className={classes.bottomContainer}>
                     {price != null ? (

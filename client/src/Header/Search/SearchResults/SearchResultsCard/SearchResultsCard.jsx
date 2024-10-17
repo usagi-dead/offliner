@@ -1,6 +1,7 @@
 import './SearchResultsCard.css';
 import React from 'react';
 import { Link } from 'react-router-dom';
+import Specs from "../../../../Card/Specs/Specs";
 
 export default function SearchResults({ item, index, isLast }) {
     return (
@@ -12,9 +13,14 @@ export default function SearchResults({ item, index, isLast }) {
                     </div>
                     <div className="search-container">
                         <span className='name'>{item.name}</span>
+
+                        <div className='search-specs-container'>
+                            <Specs textSize="16" specs={item.specs} lineNum={1} />
+                        </div>
+
                         <div className='cost-container'>
-                            {item.originalPrice == null ? 
-                                <h1 className="search-price">{item.currentPrice}</h1> : 
+                            {item.originalPrice == null ?
+                                <h1 className="search-price">{item.currentPrice}</h1> :
                                 <>
                                     <h1 className={"search-price blue"}>{item.currentPrice}</h1>
                                     <h3 className="search-default-price">{item.originalPrice}</h3>

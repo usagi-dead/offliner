@@ -9,6 +9,10 @@
     transition: box-shadow 0.3s ease-in-out;
 }
 
+.search:hover {
+    --second-color: var(--accent-color);
+}
+
 .overlay {
     position: fixed;
     top: -18px;
@@ -18,8 +22,13 @@
     backdrop-filter: blur(20px);
     background-color: rgba(0, 0, 0, 0.5);
     z-index: 1;
+    animation: overlay-in 0.3s;
 }
 
-.search:hover {
-    --second-color: var(--accent-color);
+@keyframes overlay-in {
+    from {
+        opacity: 0;
+    } to {
+        opacity: 1;
+    }
 }
