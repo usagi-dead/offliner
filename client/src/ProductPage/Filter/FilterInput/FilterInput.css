@@ -52,3 +52,7 @@
     background-color: var(--second-color);
     transition: background-color 0.3s;
 }
+
+.filters-input-active {
+    --second-color: var(--accent-color);
+}
