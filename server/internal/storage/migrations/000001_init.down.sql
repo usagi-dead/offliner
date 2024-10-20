@@ -1,3 +1,4 @@
+DROP TYPE gender_type;
 DROP  TABLE Order_Items;
 DROP  TABLE ProductAttributes;
 DROP  TABLE Attributes;

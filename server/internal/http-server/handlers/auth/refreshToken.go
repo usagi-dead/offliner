@@ -5,20 +5,34 @@ import (
 	"github.com/go-chi/render"
 	"log/slog"
 	"net/http"
-	"server/Iternal/lib/api/jwt"
-	resp "server/Iternal/lib/api/response"
-	"server/Iternal/storage/models"
+	"server/internal/lib/api/jwt"
+	resp "server/internal/lib/api/response"
+	"server/internal/storage/models"
 )
 
 type refreshAccessTokenResponse struct {
 	AccessToken string `json:"access_token"`
-	resp.Response
 }
 
 type GetUser interface {
 	GetUserById(UserId int64) (*models.User, error)
 }
 
+type UnauthorizedResponse struct {
+	Status string `json:"status" example:"error"`
+	Error  string `json:"error" example:"unauthorized"`
+}
+
+// RefreshTokenHandler godoc
+// @Summary Refresh Access Token
+// @Tags auth
+// @Description Refreshes the access token using the provided refresh token from cookies.
+// @Accept json
+// @Produce json
+// @Success 200 {object} SingInResponse "Successfully refreshed access token"
+// @Failure 401 {object} UnauthorizedResponse "Invalid or missing refresh token"
+// @Failure 500 {object} InternalServerErrorResponse "Internal server error"
+// @Router /auth/refresh-token [post]
 func RefreshTokenHandler(getUser GetUser, log *slog.Logger) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		const op string = "RefreshTokenHandler"
@@ -31,7 +45,7 @@ func RefreshTokenHandler(getUser GetUser, log *slog.Logger) func(w http.Response
 		refreshToken, err := r.Cookie("refresh_token")
 		if err != nil {
 			log.Error("failed extract access token: %v", r)
-			http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
+			http.Error(w, "token missed", http.StatusUnauthorized)
 			return
 		}
 
@@ -44,7 +58,7 @@ func RefreshTokenHandler(getUser GetUser, log *slog.Logger) func(w http.Response
 
 		user, err := getUser.GetUserById(claims.UserId)
 		if err != nil {
-			log.Error("failed find user by id: %v", err.Error())
+			log.Info("dont find user by id: %v", err.Error())
 			http.Error(w, "invalid token", http.StatusUnauthorized)
 			return
 		}
@@ -58,7 +72,7 @@ func RefreshTokenHandler(getUser GetUser, log *slog.Logger) func(w http.Response
 		}
 
 		w.Header().Set("Content-Type", "application/json")
-
+		w.WriteHeader(http.StatusOK)
 		render.JSON(w, r, resp.AccessToken(accessToken))
 	}
 }

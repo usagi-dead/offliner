@@ -35,6 +35,22 @@ var oauthConfigs = map[string]*oauth2.Config{
 	},
 }
 
+type NotSupportedProviderResponse struct {
+	Status string `json:"status" example:"Error"`
+	Error  string `json:"error" example:"provider not supported"`
+}
+
+// OauthHandler godoc
+// @Summary Start OAuth2 Authorization
+// @Tags auth
+// @Description Redirects the user to the OAuth provider for authentication.
+// @Accept json
+// @Produce json
+// @Param provider path string true "OAuth provider" example("google or yandex")
+// @Success 307 "Перенаправление к провайдеру"
+// @Failure 404 {object} NotSupportedProviderResponse "Provider not supported"
+// @Failure 500 {object} InternalServerErrorResponse "Internal server error"
+// @Router /auth/{provider} [get]
 func OauthHandler(sg StateGenerator, log *slog.Logger) func(w http.ResponseWriter, r *http.Request) {
 	log = log.With("op", "OauthHandler")
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -59,6 +75,8 @@ func OauthHandler(sg StateGenerator, log *slog.Logger) func(w http.ResponseWrite
 	}
 }
 
+// OauthCallbackHandler godoc
+// TODO: RELEASE LOGIC
 func OauthCallbackHandler(sg StateGenerator, log *slog.Logger) func(w http.ResponseWriter, r *http.Request) {
 	log = log.With("op", "OauthCallbackHandler")
 	return func(w http.ResponseWriter, r *http.Request) {

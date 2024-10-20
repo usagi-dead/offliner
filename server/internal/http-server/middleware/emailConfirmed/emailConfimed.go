@@ -3,7 +3,7 @@ package emailConfirmed
 import (
 	"log/slog"
 	"net/http"
-	ck "server/Iternal/lib/contextKeys"
+	ck "server/internal/lib/contextKeys"
 )
 
 type GetterEmailStatus interface {

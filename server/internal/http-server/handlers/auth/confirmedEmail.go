@@ -5,12 +5,12 @@ import (
 	"github.com/go-playground/validator/v10"
 	"log/slog"
 	"net/http"
-	resp "server/Iternal/lib/api/response"
+	resp "server/internal/lib/api/response"
 )
 
 type EmailConfirmedRequest struct {
-	Code  string `json:"code" validate:"required"`
-	Email string `json:"email" validate:"required,email"`
+	Code  string `json:"code" validate:"required" example:"54JK64"`
+	Email string `json:"email" validate:"required,email" example:"jon.doe@gmail.com"`
 }
 
 type EmailConfirmedCodeGetter interface {
@@ -21,6 +21,17 @@ type EmailConfirmedUpdater interface {
 	UpdateEmailStatus(Email string) error
 }
 
+// EmailConfirmedHandler godoc
+// @Summary Confirmation email address
+// @Tags auth
+// @Description Validate confirmed code and is it confirmed update email_status
+// @Accept json
+// @Produce json
+// @Param request body EmailConfirmedRequest true "data for confirmed email"
+// @Success 200 {object} UserSignUpResponse "Success email confirmation"
+// @Failure 400  "Error email confirmation"
+// @Failure 500 {object} InternalServerErrorResponse "Internal server error"
+// @Router /auth/email-confirm [post]
 func EmailConfirmedHandler(eccg EmailConfirmedCodeGetter, ecu EmailConfirmedUpdater, log *slog.Logger) func(w http.ResponseWriter, r *http.Request) {
 	log = log.With("op", "EmailConfirmedHandler")
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -60,7 +71,7 @@ func EmailConfirmedHandler(eccg EmailConfirmedCodeGetter, ecu EmailConfirmedUpda
 
 		if err := ecu.UpdateEmailStatus(req.Email); err != nil {
 			log.Error("failed to update email status", err)
-			w.WriteHeader(http.StatusBadRequest)
+			w.WriteHeader(http.StatusInternalServerError)
 			render.JSON(w, r, resp.Error("failed to update email status"))
 			return
 		}

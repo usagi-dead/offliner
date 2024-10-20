@@ -6,23 +6,32 @@ import (
 	"fmt"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/go-chi/httprate"
 	"github.com/go-chi/render"
+	"github.com/swaggo/http-swagger/v2"
 	"log/slog"
 	"net/http"
 	"os"
 	"os/signal"
-	"server/Iternal/cache"
-	"server/Iternal/config"
-	"server/Iternal/http-server/handlers/auth"
-	"server/Iternal/http-server/middleware/emailConfirmed"
-	middleJWT "server/Iternal/http-server/middleware/jwt"
-	middlelog "server/Iternal/http-server/middleware/logger"
-	resp "server/Iternal/lib/api/response"
-	"server/Iternal/lib/emailsender"
-	"server/Iternal/storage"
+	_ "server/docs"
+	"server/internal/cache"
+	"server/internal/config"
+	"server/internal/http-server/handlers/auth"
+	middleJWT "server/internal/http-server/middleware/jwt"
+	middlelog "server/internal/http-server/middleware/logger"
+	resp "server/internal/lib/api/response"
+	"server/internal/lib/emailsender"
+	"server/internal/storage"
 	"syscall"
 	"time"
 )
+
+// @title Offliner API
+// @version 1.0
+// @description REST API для приложения Offliner
+
+// @host localhost:8080
+// @BasePath /
 
 type App struct {
 	Storage     *storage.Storage
@@ -92,13 +101,21 @@ func (app *App) SetupRoutes() {
 	app.Router.Use(middleware.Recoverer)
 	app.Router.Use(middleware.URLFormat)
 
+	app.Router.Get("/swagger/*", httpSwagger.Handler(
+		httpSwagger.URL("http://localhost:8080/swagger/doc.json"), // URL к спецификации OpenAPI
+	))
+
 	// Группа для аунтификации
 	app.Router.Route("/auth", func(r chi.Router) {
-		r.Post("/sign-up", auth.SignUpHandler(app.EmailSender, app.Cache, app.Storage, app.Log))
+		r.Post("/sign-up", auth.SignUpHandler(app.Storage, app.Log))
 		r.Post("/sign-in", auth.SignInHandler(app.Storage, app.Log))
-		r.Post("/confirmed-email", auth.EmailConfirmedHandler(app.Cache, app.Storage, app.Log))
+		r.Post("/refresh-token", auth.RefreshTokenHandler(app.Storage, app.Log))
+		r.Post("/email-confirm", auth.EmailConfirmedHandler(app.Cache, app.Storage, app.Log))
+		r.Route("/email", func(r chi.Router) {
+			r.Use(httprate.Limit(1, 1*time.Minute, httprate.WithKeyFuncs(httprate.KeyByIP)))
+			r.Post("/send-confirm-code", auth.SendConfirmedEmailCodeHandler(app.Cache, app.EmailSender, app.Log))
+		})
 		//r.Post("/complete-profile", auth.CompleteProfileHandler(app.Storage, app.Log))
-		r.Get("/refresh-token", auth.RefreshTokenHandler(app.Storage, app.Log))
 		r.Get("/{provider}", auth.OauthHandler(app.Cache, app.Log))
 		r.Get("/{provider}/callback", auth.OauthCallbackHandler(app.Cache, app.Log))
 	})
@@ -106,7 +123,6 @@ func (app *App) SetupRoutes() {
 	// Группа для пользовательских маршрутов (требует авторизации)
 	app.Router.Group(func(r chi.Router) {
 		r.Use(middleJWT.New(app.Log))
-		r.Use(emailConfirmed.New(app.Storage, app.Log))
 		r.Get("/profile", func(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusCreated)
 			render.JSON(w, r, resp.OK())

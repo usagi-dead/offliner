@@ -8,7 +8,7 @@ import (
 	"github.com/google/uuid"
 	"math/rand"
 	"os"
-	"server/Iternal/config"
+	"server/internal/config"
 	"strings"
 	"time"
 )

@@ -1,19 +1,20 @@
-CREATE TYPE email_status AS ENUM ('confirmed', 'not confirmed');
+CREATE TYPE gender_type AS ENUM ('M', 'F');
 -- Создание таблицы Users
 CREATE TABLE Users (
     user_id SERIAL PRIMARY KEY,
-    hashed_password VARCHAR(255) NOT NULL,
-    role VARCHAR(50) NOT NULL,
-    surname VARCHAR(100) NOT NULL,
-    name VARCHAR(100) NOT NULL,
+    hashed_password VARCHAR(255),
+    role VARCHAR(50) NOT NULL DEFAULT 'user',
+    surname VARCHAR(100),
+    name VARCHAR(100),
     patronymic VARCHAR(100),
-    date_of_birth DATE NOT NULL,
+    date_of_birth DATE,
     phone_number VARCHAR(15),
     email VARCHAR(100) UNIQUE NOT NULL,
-    avatar_url VARCHAR(255) NOT NULL DEFAULT '',
-    status_email email_status NOT NULL DEFAULT 'not confirmed',
-    gender CHAR(1) CHECK (gender IN ('M', 'F'))
+    avatar_url VARCHAR(255) DEFAULT '',
+    verified_email  BOOLEAN NOT NULL DEFAULT false,
+    gender gender_type
 );
+
 
 -- Создание таблицы Orders
 CREATE TABLE Orders (

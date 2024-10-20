@@ -1,11 +1,11 @@
-package JWT
+package jwt
 
 import (
 	"context"
 	"log/slog"
 	"net/http"
-	"server/Iternal/lib/api/jwt"
-	ck "server/Iternal/lib/contextKeys"
+	"server/internal/lib/api/jwt"
+	ck "server/internal/lib/contextKeys"
 )
 
 func New(log *slog.Logger) func(next http.Handler) http.Handler {

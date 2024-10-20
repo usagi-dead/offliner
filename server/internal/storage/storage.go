@@ -7,8 +7,8 @@ import (
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"os"
-	"server/Iternal/config"
-	"server/Iternal/storage/models"
+	"server/internal/config"
+	"server/internal/storage/models"
 )
 
 var (
@@ -28,17 +28,12 @@ func New(cfg config.DbConfig) (*Storage, error) {
 		return nil, err
 	}
 
-	//TODO: init migrathions
-
 	return &Storage{db: pool}, nil
 }
 
-func (s *Storage) CreateUser(user *models.User) error {
-	err := s.db.QueryRow(context.Background(),
-		`INSERT INTO users (hashed_password, surname, name, patronymic, date_of_birth, phone_number, email, gender, role)
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) 
-        RETURNING user_id`,
-		user.HashedPassword, user.Surname, user.Name, user.Patronymic, user.DateOfBirth, user.PhoneNumber, user.Email, user.Gender, user.Role).Scan(&user.UserId)
+func (s *Storage) CreateUser(email string, hashedPassword string) error {
+	_, err := s.db.Exec(context.Background(),
+		`INSERT INTO users (email, hashed_password) VALUES ($1, $2)`, email, hashedPassword)
 
 	if err != nil {
 		if err.Error() == `ERROR: duplicate key value violates unique constraint "users_email_key" (SQLSTATE 23505)` {
@@ -69,7 +64,7 @@ func (s *Storage) GetUserByEmail(Email string) (*models.User, error) {
 		&user.PhoneNumber,
 		&user.Email,
 		&user.AvatarUrl,
-		&user.EmailStatus,
+		&user.VerifiedEmail,
 		&user.Gender,
 	)
 
@@ -118,7 +113,7 @@ func (s *Storage) GetUserById(UserId int64) (*models.User, error) {
 
 func (s *Storage) IsEmailConfirmed(UserId int64) (bool, error) {
 	row := s.db.QueryRow(context.Background(),
-		`SELECT status_email FROM users WHERE user_id = $1`,
+		`SELECT verified_email FROM users WHERE user_id = $1`,
 		UserId,
 	)
 
@@ -136,7 +131,7 @@ func (s *Storage) IsEmailConfirmed(UserId int64) (bool, error) {
 
 func (s *Storage) UpdateEmailStatus(Email string) error {
 	_, err := s.db.Exec(context.Background(),
-		`UPDATE users SET status_email = 'confirmed' WHERE email = $1`,
+		`UPDATE users SET verified_email = true WHERE email = $1`,
 		Email,
 	)
 

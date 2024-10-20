@@ -7,6 +7,13 @@ import (
 	"github.com/go-playground/validator/v10"
 )
 
+// Response godoc
+// @Summary Response
+// @Description Структура для формата ответа API
+// @ID Response
+// @Property status string The status of the response (ok or error)
+// @Property error string The error message if the status is error (optional)
+// @Property access_token string The access token if the status is ok (optional)
 type Response struct {
 	Status      string `json:"status"`
 	Error       string `json:"error,omitempty"`
@@ -47,12 +54,6 @@ func ValidationError(errs validator.ValidationErrors) Response {
 			errMsgs = append(errMsgs, fmt.Sprintf("field %s is a required field", err.Field()))
 		case "email":
 			errMsgs = append(errMsgs, fmt.Sprintf("field %s is not a valid Email", err.Field()))
-		case "datetime":
-			errMsgs = append(errMsgs, fmt.Sprintf("field %s is not a valid DateOfBirth", err.Field()))
-		case "oneof":
-			errMsgs = append(errMsgs, fmt.Sprintf("field %s is not a valid Gender", err.Field()))
-		default:
-			errMsgs = append(errMsgs, fmt.Sprintf("field %s is not valid", err.Field()))
 		}
 	}
 
