@@ -1,4 +1,4 @@
-CREATE TYPE gender_type AS ENUM ('M', 'F');
+CREATE TYPE gender_type AS ENUM ('male', 'female');
 -- Создание таблицы Users
 CREATE TABLE Users (
     user_id SERIAL PRIMARY KEY,
@@ -10,7 +10,7 @@ CREATE TABLE Users (
     date_of_birth DATE,
     phone_number VARCHAR(15),
     email VARCHAR(100) UNIQUE NOT NULL,
-    avatar_url VARCHAR(255) DEFAULT '',
+    avatar_url VARCHAR(255) DEFAULT 'http://localhost:8080/user/avatar?filename=default.webp',
     verified_email  BOOLEAN NOT NULL DEFAULT false,
     gender gender_type
 );

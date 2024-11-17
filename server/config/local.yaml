@@ -1,15 +1,15 @@
 env: "local"
 db:
     username: "postgres"
-    address: "localhost:5436"
+    address: "db:5432"
     dbname: "postgres"
     sslmode: "disable"
 http_server:
-    address: "localhost:8080"
+    address: "0.0.0.0:8080"
     timeout: 4s
     idle_timeout: 60s
 cache:
-    address: "localhost:6379"
+    address: "redis:6379"
     db: 0
     state_expiration: 7m
     email_confirmed_code_expiration: 3m

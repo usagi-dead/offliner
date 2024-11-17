@@ -41,7 +41,8 @@ type SignIn interface {
 // @Param user body SingInRequest true "User login details"
 // @Success 200 {object} SingInResponse "User successfully signed in"
 // @Failure 400 {object} ValidationErrorResponse "Invalid request payload or validation error"
-// @Failure 404 {object} ErrorResponse "Invalid Password or Email"
+// @Failure 401 {object} ErrorResponse"Invalid Password or Email"
+// @Failure 403 {object} ErrorResponse "User email is not confirmed"
 // @Failure 500 {object} InternalServerErrorResponse "Internal server error"
 // @Router /auth/sign-in [post]
 func SignInHandler(signIn SignIn, log *slog.Logger) func(http.ResponseWriter, *http.Request) {
@@ -72,15 +73,20 @@ func SignInHandler(signIn SignIn, log *slog.Logger) func(http.ResponseWriter, *h
 
 		user, err := signIn.GetUserByEmail(req.Email)
 		if err != nil {
-			log.Error("User not found", err)
-			w.WriteHeader(http.StatusForbidden)
+			log.Error("Db err", err)
+			w.WriteHeader(http.StatusInternalServerError)
+			render.JSON(w, r, resp.Error("db failed"))
+			return
+		}
+		if user == nil {
+			w.WriteHeader(http.StatusUnauthorized)
 			render.JSON(w, r, resp.Error("Invalid Password or Email"))
 			return
 		}
 
 		if err = bcrypt.CompareHashAndPassword([]byte(*user.HashedPassword), []byte(req.Password)); err != nil {
 			log.Info("Invalid password", err)
-			w.WriteHeader(http.StatusForbidden)
+			w.WriteHeader(http.StatusUnauthorized)
 			render.JSON(w, r, resp.Error("Invalid Password or Email"))
 			return
 		}

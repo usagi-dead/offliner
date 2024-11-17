@@ -2,7 +2,6 @@ package auth
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
@@ -12,6 +11,10 @@ import (
 	"log/slog"
 	"net/http"
 	"os"
+	"server/internal/lib/api/jwt"
+	resp "server/internal/lib/api/response"
+	"server/internal/storage/models"
+	"time"
 )
 
 type StateGenerator interface {
@@ -35,9 +38,30 @@ var oauthConfigs = map[string]*oauth2.Config{
 	},
 }
 
+type GoogleUserData struct {
+	Email     string  `json:"email"`
+	Name      *string `json:"given_name"`
+	Surname   *string `json:"family_name"`
+	AvatarUrl *string `json:"picture"`
+}
+
+type YandexUserData struct {
+	Email       string  `json:"default_email"`
+	Name        *string `json:"first_name"`
+	Surname     *string `json:"last_name"`
+	DateOfBirth string  `json:"birthday"`
+	Gender      *string `json:"sex"`
+	PhoneNumber *string `json:"default_phone.number"`
+}
+
 type NotSupportedProviderResponse struct {
 	Status string `json:"status" example:"Error"`
 	Error  string `json:"error" example:"provider not supported"`
+}
+
+type Data interface {
+	GetUserByEmail(Email string) (*models.User, error)
+	CreateUserAfterOauth(user *models.User) (int64, error)
 }
 
 // OauthHandler godoc
@@ -76,8 +100,7 @@ func OauthHandler(sg StateGenerator, log *slog.Logger) func(w http.ResponseWrite
 }
 
 // OauthCallbackHandler godoc
-// TODO: RELEASE LOGIC
-func OauthCallbackHandler(sg StateGenerator, log *slog.Logger) func(w http.ResponseWriter, r *http.Request) {
+func OauthCallbackHandler(d Data, sg StateGenerator, log *slog.Logger) func(w http.ResponseWriter, r *http.Request) {
 	log = log.With("op", "OauthCallbackHandler")
 	return func(w http.ResponseWriter, r *http.Request) {
 		provider := chi.URLParam(r, "provider")
@@ -113,17 +136,113 @@ func OauthCallbackHandler(sg StateGenerator, log *slog.Logger) func(w http.Respo
 		client := config.Client(context.Background(), token)
 		userInfo, err := fetchUserInfo(client, provider)
 		if err != nil {
-			log.Error("Failed to fetch user info: " + err.Error())
-			http.Error(w, "Failed to get user info", http.StatusBadRequest)
+			log.Error("failed to fetch user info: " + err.Error())
+			http.Error(w, "failed to get user info", http.StatusBadRequest)
 			return
 		}
 
+		var email string
+		switch u := userInfo.(type) {
+		case *GoogleUserData:
+			email = u.Email
+		case *YandexUserData:
+			email = u.Email
+		default:
+			log.Error("unknown user data type")
+			http.Error(w, "failed to get user info", http.StatusBadRequest)
+			return
+		}
+
+		user, err := d.GetUserByEmail(email)
+		if err != nil {
+			log.Error("database error: " + err.Error())
+			http.Error(w, "internal server error", http.StatusInternalServerError)
+			return
+		}
+
+		if user != nil {
+			accessToken, err := jwt.GenerateAccessToken(user.UserId, user.Role)
+			if err != nil {
+				log.Error("failed to generate access token", err)
+				w.WriteHeader(http.StatusInternalServerError)
+				render.JSON(w, r, resp.Error("failed to generate access token"))
+				return
+			}
+
+			refreshToken, err := jwt.GenerateRefreshToken(user.UserId)
+			if err != nil {
+				log.Error("failed to generate refresh token", err)
+				w.WriteHeader(http.StatusInternalServerError)
+				render.JSON(w, r, resp.Error("failed to generate refresh token"))
+				return
+			}
+
+			log.Info("sign in success", slog.String("email", user.Email))
+
+			http.SetCookie(w, &http.Cookie{
+				Name:     "refresh_token",
+				Value:    refreshToken,
+				Expires:  time.Now().Add(15 * 24 * time.Hour),
+				HttpOnly: true,
+				Path:     "/",
+			})
+
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusOK)
+			render.JSON(w, r, resp.AccessToken(accessToken))
+			return
+		}
+
+		switch u := userInfo.(type) {
+		case *GoogleUserData:
+			user = ConvertGoogleUserDataToUser(u)
+		case *YandexUserData:
+			user = ConvertYandexUserDataToUser(u)
+		default:
+			log.Error("unknown user data type")
+			http.Error(w, "unknown user data type", http.StatusBadRequest)
+			return
+		}
+
+		UserID, err := d.CreateUserAfterOauth(user)
+		if err != nil {
+			log.Error("failed to create user: " + err.Error())
+			http.Error(w, "internal server error", http.StatusInternalServerError)
+			return
+		}
+
+		accessToken, err := jwt.GenerateAccessToken(UserID, "user")
+		if err != nil {
+			log.Error("failed to generate access token", err)
+			w.WriteHeader(http.StatusInternalServerError)
+			render.JSON(w, r, resp.Error("failed to generate access token"))
+			return
+		}
+
+		refreshToken, err := jwt.GenerateRefreshToken(UserID)
+		if err != nil {
+			log.Error("failed to generate refresh token", err)
+			w.WriteHeader(http.StatusInternalServerError)
+			render.JSON(w, r, resp.Error("failed to generate refresh token"))
+			return
+		}
+
+		http.SetCookie(w, &http.Cookie{
+			Name:     "refresh_token",
+			Value:    refreshToken,
+			Expires:  time.Now().Add(15 * 24 * time.Hour),
+			HttpOnly: true,
+			Path:     "/",
+		})
+
 		w.Header().Set("Content-Type", "application/json")
-		render.JSON(w, r, userInfo)
+		w.WriteHeader(http.StatusCreated)
+		render.JSON(w, r, resp.AccessToken(accessToken))
+		return
 	}
 }
 
-func fetchUserInfo(client *http.Client, provider string) (map[string]interface{}, error) {
+func fetchUserInfo(client *http.Client, provider string) (interface{}, error) {
 	var url string
 	switch provider {
 	case "google":
@@ -140,10 +259,56 @@ func fetchUserInfo(client *http.Client, provider string) (map[string]interface{}
 	}
 	defer resp.Body.Close()
 
-	var userInfo map[string]interface{}
-	if err := json.NewDecoder(resp.Body).Decode(&userInfo); err != nil {
-		return nil, err
+	switch provider {
+	case "google":
+		var user GoogleUserData
+		if err := render.DecodeJSON(resp.Body, &user); err != nil {
+			return nil, err
+		}
+		return &user, nil
+	case "yandex":
+		var user YandexUserData
+		if err := render.DecodeJSON(resp.Body, &user); err != nil {
+			return nil, err
+		}
+		return &user, nil
+	default:
+		return nil, fmt.Errorf("unknown provider: %v", provider)
+	}
+}
+
+func ConvertGoogleUserDataToUser(googleData *GoogleUserData) *models.User {
+	return &models.User{
+		Email:         googleData.Email,
+		Name:          googleData.Name,
+		Surname:       googleData.Surname,
+		AvatarUrl:     googleData.AvatarUrl,
+		VerifiedEmail: true,
+		Role:          "user",
+	}
+}
+
+func ConvertYandexUserDataToUser(yandexData *YandexUserData) *models.User {
+	var dob *time.Time
+	if yandexData.DateOfBirth != "" {
+		parsedDOB, err := time.Parse(time.RFC3339, yandexData.DateOfBirth)
+		if err == nil {
+			dateOnly := parsedDOB.Format("2006-01-02")
+			parsedDateOnly, err := time.Parse("2006-01-02", dateOnly)
+			if err == nil {
+				dob = &parsedDateOnly
+			}
+		}
 	}
 
-	return userInfo, nil
+	return &models.User{
+		Email:         yandexData.Email,
+		Name:          yandexData.Name,
+		Surname:       yandexData.Surname,
+		DateOfBirth:   dob,
+		PhoneNumber:   yandexData.PhoneNumber,
+		Gender:        yandexData.Gender,
+		VerifiedEmail: true,
+		Role:          "user",
+	}
 }

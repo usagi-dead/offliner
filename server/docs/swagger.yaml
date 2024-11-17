@@ -1,0 +1,369 @@
+basePath: /
+definitions:
+  auth.ConflictErrorResponse:
+    properties:
+      error:
+        example: user with this email already sign-up
+        type: string
+      status:
+        example: Error
+        type: string
+    type: object
+  auth.EmailConfirmedRequest:
+    properties:
+      code:
+        example: 54JK64
+        type: string
+      email:
+        example: jon.doe@gmail.com
+        type: string
+    required:
+    - code
+    - email
+    type: object
+  auth.ErrorResponse:
+    properties:
+      error:
+        example: Invalid Password or Email
+        type: string
+      status:
+        example: Error
+        type: string
+    type: object
+  auth.InternalServerErrorResponse:
+    properties:
+      error:
+        example: failed to sign up
+        type: string
+      status:
+        example: Error
+        type: string
+    type: object
+  auth.NotSupportedProviderResponse:
+    properties:
+      error:
+        example: provider not supported
+        type: string
+      status:
+        example: Error
+        type: string
+    type: object
+  auth.SendConfirmedEmailCodeRequest:
+    properties:
+      email:
+        example: jon.doe@gmail.com
+        type: string
+    required:
+    - email
+    type: object
+  auth.SingInRequest:
+    properties:
+      email:
+        example: jon.doe@gmail.com
+        type: string
+      password:
+        example: SuperPassword123
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  auth.SingInResponse:
+    properties:
+      access_token:
+        example: asdfasdfahgwea94i5)()(&_.KJFDI{.sadfasdIOSDJ
+        type: string
+      status:
+        example: OK
+        type: string
+    type: object
+  auth.UnauthorizedResponse:
+    properties:
+      error:
+        example: unauthorized
+        type: string
+      status:
+        example: error
+        type: string
+    type: object
+  auth.UserSignUpRequest:
+    properties:
+      email:
+        example: jon.doe@gmail.com
+        type: string
+      password:
+        example: SuperPassword123
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  auth.UserSignUpResponse:
+    properties:
+      status:
+        example: OK
+        type: string
+    type: object
+  auth.ValidationErrorResponse:
+    properties:
+      error:
+        example: field Email is not a valid Email, field Password is a required field
+        type: string
+      status:
+        example: Error
+        type: string
+    type: object
+  profile.CompleteProfileResponse:
+    properties:
+      message:
+        type: string
+      status:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: REST API для приложения Offliner
+  title: Offliner API
+  version: "1.0"
+paths:
+  /auth/{provider}:
+    get:
+      consumes:
+      - application/json
+      description: Redirects the user to the OAuth provider for authentication.
+      parameters:
+      - description: OAuth provider
+        example: '"google or yandex"'
+        in: path
+        name: provider
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "307":
+          description: Перенаправление к провайдеру
+        "404":
+          description: Provider not supported
+          schema:
+            $ref: '#/definitions/auth.NotSupportedProviderResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/auth.InternalServerErrorResponse'
+      summary: Start OAuth2 Authorization
+      tags:
+      - auth
+  /auth/email-confirm:
+    post:
+      consumes:
+      - application/json
+      description: Validate confirmed code and is it confirmed update email_status
+      parameters:
+      - description: data for confirmed email
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/auth.EmailConfirmedRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success email confirmation
+          schema:
+            $ref: '#/definitions/auth.UserSignUpResponse'
+        "400":
+          description: Error email confirmation
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/auth.InternalServerErrorResponse'
+      summary: Confirmation email address
+      tags:
+      - auth
+  /auth/email/send-confirm-code:
+    post:
+      consumes:
+      - application/json
+      description: Генерирует код подтверждения и отправляет его на указанный email
+      parameters:
+      - description: Email пользователя для подтверждения
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/auth.SendConfirmedEmailCodeRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Код подтверждения успешно отправлен
+          schema:
+            $ref: '#/definitions/auth.UserSignUpResponse'
+        "400":
+          description: Ошибка валидации или неверный запрос
+          schema:
+            $ref: '#/definitions/auth.ValidationErrorResponse'
+        "500":
+          description: Внутренняя ошибка сервера
+          schema:
+            $ref: '#/definitions/auth.InternalServerErrorResponse'
+      summary: Отправка кода подтверждения на email
+      tags:
+      - auth
+  /auth/refresh-token:
+    post:
+      consumes:
+      - application/json
+      description: Refreshes the access token using the provided refresh token from
+        cookies.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully refreshed access token
+          schema:
+            $ref: '#/definitions/auth.SingInResponse'
+        "401":
+          description: Invalid or missing refresh token
+          schema:
+            $ref: '#/definitions/auth.UnauthorizedResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/auth.InternalServerErrorResponse'
+      summary: Refresh Access Token
+      tags:
+      - auth
+  /auth/sign-in:
+    post:
+      consumes:
+      - application/json
+      description: Create access and refresh token and return them to the user
+      parameters:
+      - description: User login details
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/auth.SingInRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User successfully signed in
+          schema:
+            $ref: '#/definitions/auth.SingInResponse'
+        "400":
+          description: Invalid request payload or validation error
+          schema:
+            $ref: '#/definitions/auth.ValidationErrorResponse'
+        "401":
+          description: Invalid Password or Email
+          schema:
+            $ref: '#/definitions/auth.ErrorResponse'
+        "403":
+          description: User email is not confirmed
+          schema:
+            $ref: '#/definitions/auth.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/auth.InternalServerErrorResponse'
+      summary: Sign In User
+      tags:
+      - auth
+  /auth/sign-up:
+    post:
+      consumes:
+      - application/json
+      description: Creates a new user account with the provided details.
+      parameters:
+      - description: User registration details
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/auth.UserSignUpRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: User successfully registered
+          schema:
+            $ref: '#/definitions/auth.UserSignUpResponse'
+        "400":
+          description: Invalid request payload or validation error
+          schema:
+            $ref: '#/definitions/auth.ValidationErrorResponse'
+        "409":
+          description: User with this email already exists
+          schema:
+            $ref: '#/definitions/auth.ConflictErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/auth.InternalServerErrorResponse'
+      summary: Sign Up User
+      tags:
+      - auth
+  /user/avatar:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves the avatar image based on the filename provided in the
+        query parameter.
+      parameters:
+      - description: Filename of the avatar image
+        in: query
+        name: filename
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Avatar image
+          schema:
+            type: file
+      security:
+      - ApiKeyAuth: []
+      summary: Get User Avatar
+      tags:
+      - profile
+  /user/complete-profile:
+    put:
+      consumes:
+      - multipart/form-data
+      description: Updates user profile details such as name, surname, patronymic,
+        date of birth, phone number, gender, and avatar.
+      parameters:
+      - description: User profile data JSON
+        in: formData
+        name: json
+        required: true
+        type: string
+      - description: Avatar image file
+        in: formData
+        name: avatar
+        type: file
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: User updated successfully
+          schema:
+            $ref: '#/definitions/profile.CompleteProfileResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Update User Profile
+      tags:
+      - profile
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

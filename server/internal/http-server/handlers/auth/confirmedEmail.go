@@ -76,7 +76,7 @@ func EmailConfirmedHandler(eccg EmailConfirmedCodeGetter, ecu EmailConfirmedUpda
 			return
 		}
 
-		w.WriteHeader(http.StatusOK)
+		w.WriteHeader(http.StatusCreated)
 		render.JSON(w, r, resp.OK())
 	}
 }

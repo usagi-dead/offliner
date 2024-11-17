@@ -9,14 +9,14 @@ import (
 )
 
 func New(log *slog.Logger) func(next http.Handler) http.Handler {
+	const op string = "jwt-middleware"
+	log = log.With(
+		slog.String("op", op),
+	)
+
+	log.Info("middlewareJWT enabled")
+
 	return func(next http.Handler) http.Handler {
-		const op string = "jwt-middleware"
-		log = log.With(
-			slog.String("op", op),
-		)
-
-		log.Info("middlewareJWT enabled")
-
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			tokenString, err := jwt.ExtractJWTFromHeader(r)
 			if err != nil {

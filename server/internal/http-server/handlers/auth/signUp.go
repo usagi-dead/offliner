@@ -8,8 +8,10 @@ import (
 	"golang.org/x/crypto/bcrypt"
 	"log/slog"
 	"net/http"
+	"server/internal/lib/CustomErrors"
+	"server/internal/lib/api/jwt"
 	resp "server/internal/lib/api/response"
-	"server/internal/storage"
+	"time"
 )
 
 type UserSignUpRequest struct {
@@ -37,7 +39,7 @@ type InternalServerErrorResponse struct {
 }
 
 type SignUp interface {
-	CreateUser(email string, hashedPassword string) error
+	CreateUser(email string, hashedPassword string) (int64, error)
 }
 
 var validate = validator.New()
@@ -88,10 +90,10 @@ func SignUpHandler(signUp SignUp, log *slog.Logger) func(http.ResponseWriter, *h
 			return
 		}
 
-		err = signUp.CreateUser(req.Email, string(hashedPassword))
+		UserID, err := signUp.CreateUser(req.Email, string(hashedPassword))
 
 		if err != nil {
-			if errors.Is(err, storage.ErrEmailExists) {
+			if errors.Is(err, CustomErrors.ErrEmailExists) {
 				log.Info("email already exists", slog.String("email", req.Email))
 				w.WriteHeader(http.StatusConflict)
 				render.JSON(w, r, resp.Error("user with this email already sign-up"))
@@ -104,7 +106,34 @@ func SignUpHandler(signUp SignUp, log *slog.Logger) func(http.ResponseWriter, *h
 		}
 
 		log.Info("sign up success", slog.String("email", req.Email))
+
+		accessToken, err := jwt.GenerateAccessToken(UserID, "user")
+		if err != nil {
+			log.Error("failed to generate access token", err)
+			w.WriteHeader(http.StatusInternalServerError)
+			render.JSON(w, r, resp.Error("failed to generate access token"))
+			return
+		}
+
+		refreshToken, err := jwt.GenerateRefreshToken(UserID)
+		if err != nil {
+			log.Error("failed to generate refresh token", err)
+			w.WriteHeader(http.StatusInternalServerError)
+			render.JSON(w, r, resp.Error("failed to generate refresh token"))
+			return
+		}
+
+		http.SetCookie(w, &http.Cookie{
+			Name:     "refresh_token",
+			Value:    refreshToken,
+			Expires:  time.Now().Add(15 * 24 * time.Hour),
+			HttpOnly: true,
+			Path:     "/",
+		})
+
+		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusCreated)
-		render.JSON(w, r, resp.OK())
+		render.JSON(w, r, resp.AccessToken(accessToken))
+		return
 	}
 }

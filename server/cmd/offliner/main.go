@@ -7,7 +7,6 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/httprate"
-	"github.com/go-chi/render"
 	"github.com/swaggo/http-swagger/v2"
 	"log/slog"
 	"net/http"
@@ -17,9 +16,9 @@ import (
 	"server/internal/cache"
 	"server/internal/config"
 	"server/internal/http-server/handlers/auth"
+	"server/internal/http-server/handlers/profile"
 	middleJWT "server/internal/http-server/middleware/jwt"
 	middlelog "server/internal/http-server/middleware/logger"
-	resp "server/internal/lib/api/response"
 	"server/internal/lib/emailsender"
 	"server/internal/storage"
 	"syscall"
@@ -32,6 +31,10 @@ import (
 
 // @host localhost:8080
 // @BasePath /
+
+// @securityDefinitions.apikey ApiKeyAuth
+// @in header
+// @name Authorization
 
 type App struct {
 	Storage     *storage.Storage
@@ -100,6 +103,7 @@ func (app *App) SetupRoutes() {
 	app.Router.Use(middlelog.New(app.Log))
 	app.Router.Use(middleware.Recoverer)
 	app.Router.Use(middleware.URLFormat)
+	var jwtMiddleware = middleJWT.New(app.Log)
 
 	app.Router.Get("/swagger/*", httpSwagger.Handler(
 		httpSwagger.URL("http://localhost:8080/swagger/doc.json"), // URL к спецификации OpenAPI
@@ -109,39 +113,37 @@ func (app *App) SetupRoutes() {
 	app.Router.Route("/auth", func(r chi.Router) {
 		r.Post("/sign-up", auth.SignUpHandler(app.Storage, app.Log))
 		r.Post("/sign-in", auth.SignInHandler(app.Storage, app.Log))
-		r.Post("/refresh-token", auth.RefreshTokenHandler(app.Storage, app.Log))
+		//r.Post("/refresh-token", auth.RefreshTokenHandler(app.Storage, app.Log))
 		r.Post("/email-confirm", auth.EmailConfirmedHandler(app.Cache, app.Storage, app.Log))
 		r.Route("/email", func(r chi.Router) {
 			r.Use(httprate.Limit(1, 1*time.Minute, httprate.WithKeyFuncs(httprate.KeyByIP)))
 			r.Post("/send-confirm-code", auth.SendConfirmedEmailCodeHandler(app.Cache, app.EmailSender, app.Log))
 		})
-		//r.Post("/complete-profile", auth.CompleteProfileHandler(app.Storage, app.Log))
 		r.Get("/{provider}", auth.OauthHandler(app.Cache, app.Log))
-		r.Get("/{provider}/callback", auth.OauthCallbackHandler(app.Cache, app.Log))
+		r.Get("/{provider}/callback", auth.OauthCallbackHandler(app.Storage, app.Cache, app.Log))
 	})
 
 	// Группа для пользовательских маршрутов (требует авторизации)
-	app.Router.Group(func(r chi.Router) {
-		r.Use(middleJWT.New(app.Log))
-		r.Get("/profile", func(w http.ResponseWriter, r *http.Request) {
-			w.WriteHeader(http.StatusCreated)
-			render.JSON(w, r, resp.OK())
-		})
+	app.Router.Route("/user", func(r chi.Router) {
+		r.Use(jwtMiddleware)
+		r.Get("/avatar", profile.AvatarHandler(app.Log))
+		//r.Put("/complete-profile", profile.CompleteProfileHandler(app.Storage, app.Log))
+		//r.Get("/me", profile.ProfileHandler(app.Storage, app.Log))
 	})
 
-	// Группа для административных маршрутов
-	app.Router.Route("/admin", func(r chi.Router) {
-		r.Use(middleJWT.New(app.Log))
-		//r.Use(middleAdmin)
-	})
-
-	//Группа маршутов для супперадминов для создание админов
-	app.Router.Group(func(r chi.Router) {
-		r.Use(middleJWT.New(app.Log))
-		//r.Use(WhiteIpList(WhiteList)
-		//r.Use(middleSuperAdmin)
-		//r.Post("/admin/create", auth.CrateAdminHandler(app.Storage, app.Log))
-	})
+	//// Группа для административных маршрутов
+	//app.Router.Route("/admin", func(r chi.Router) {
+	//	r.Use(middleJWT.New(app.Log))
+	//	//r.Use(middleAdmin)
+	//})
+	//
+	////Группа маршутов для супперадминов для создание админов
+	//app.Router.Group(func(r chi.Router) {
+	//	r.Use(middleJWT.New(app.Log))
+	//	//r.Use(WhiteIpList(WhiteList)
+	//	//r.Use(middleSuperAdmin)
+	//	//r.Post("/admin/create", auth.CrateAdminHandler(app.Storage, app.Log))
+	//})
 }
 
 func main() {
