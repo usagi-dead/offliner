@@ -13,12 +13,10 @@ import (
 	_ "github.com/jackc/pgx/v5/stdlib" // Важно для поддержки stdlib
 )
 
-// Migrator отвечает за управление миграциями
 type Migrator struct {
 	srcDriver source.Driver
 }
 
-// MustGetNewMigrator инициализирует новый объект Migrator
 func MustGetNewMigrator(sqlFiles embed.FS, dirName string) *Migrator {
 	srcDriver, err := iofs.New(sqlFiles, dirName)
 	if err != nil {
@@ -27,7 +25,6 @@ func MustGetNewMigrator(sqlFiles embed.FS, dirName string) *Migrator {
 	return &Migrator{srcDriver: srcDriver}
 }
 
-// ApplyMigrations применяет миграции к базе данных
 func (m *Migrator) ApplyMigrations(dbURL string) error {
 	// Открываем соединение через stdlib
 	db, err := sql.Open("pgx", dbURL)

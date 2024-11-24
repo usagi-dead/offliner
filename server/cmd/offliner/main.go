@@ -6,35 +6,25 @@ import (
 	"fmt"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
-	"github.com/go-chi/httprate"
-	"github.com/swaggo/http-swagger/v2"
+	// "github.com/go-chi/httprate"
+	swag "github.com/swaggo/http-swagger/v2"
 	"log/slog"
 	"net/http"
 	"os"
 	"os/signal"
+	"server/api/lib/emailsender"
+	// middleJWT "server/api/middleware/jwt"
+	middlelog "server/api/middleware/logger"
 	_ "server/docs"
 	"server/internal/cache"
 	"server/internal/config"
-	"server/internal/http-server/handlers/auth"
-	"server/internal/http-server/handlers/profile"
-	middleJWT "server/internal/http-server/middleware/jwt"
-	middlelog "server/internal/http-server/middleware/logger"
-	"server/internal/lib/emailsender"
+	"server/internal/features/user/data"
+	"server/internal/features/user/handlers"
+	"server/internal/features/user/services"
 	"server/internal/storage"
 	"syscall"
 	"time"
 )
-
-// @title Offliner API
-// @version 1.0
-// @description REST API для приложения Offliner
-
-// @host localhost:8080
-// @BasePath /
-
-// @securityDefinitions.apikey ApiKeyAuth
-// @in header
-// @name Authorization
 
 type App struct {
 	Storage     *storage.Storage
@@ -46,9 +36,14 @@ type App struct {
 }
 
 func NewApp(cfg *config.Config, log *slog.Logger) (*App, error) {
-	Storage, err := storage.New(cfg.DbConfig)
+
+	Storage, err := storage.NewStorage(cfg.DbConfig)
 	if err != nil {
 		return nil, fmt.Errorf("db init failed: %w", err)
+	}
+
+	if err := Storage.ApplyMigrations(cfg.DbConfig); err != nil {
+		return nil, fmt.Errorf("apply migrations failed: %w", err)
 	}
 
 	Cache, err := cache.New(cfg.CacheConfig)
@@ -81,6 +76,7 @@ func (app *App) Start() error {
 	}()
 
 	app.Log.Info("server started", slog.String("Addr", app.Cfg.HttpServerConfig.Address))
+	app.Log.Info("docs " + "http://localhost:8080/swagger/index.html#/")
 
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
@@ -99,37 +95,42 @@ func (app *App) Start() error {
 }
 
 func (app *App) SetupRoutes() {
-	app.Router.Use(middleware.RequestID)
-	app.Router.Use(middlelog.New(app.Log))
-	app.Router.Use(middleware.Recoverer)
-	app.Router.Use(middleware.URLFormat)
-	var jwtMiddleware = middleJWT.New(app.Log)
 
-	app.Router.Get("/swagger/*", httpSwagger.Handler(
-		httpSwagger.URL("http://localhost:8080/swagger/doc.json"), // URL к спецификации OpenAPI
+	app.Router.Use(
+		middleware.Recoverer,
+		middleware.RequestID,
+		middlelog.New(app.Log),
+		middleware.URLFormat,
+	)
+
+	// var jwtMiddleware = middleJWT.New(app.Log)
+
+	//Swagger UI endpoint
+	app.Router.Get("/swagger/*", swag.Handler(
+		swag.URL("http://localhost:8080/swagger/doc.json"),
 	))
 
+	apiVersion := "/v1"
+
 	// Группа для аунтификации
-	app.Router.Route("/auth", func(r chi.Router) {
-		r.Post("/sign-up", auth.SignUpHandler(app.Storage, app.Log))
-		r.Post("/sign-in", auth.SignInHandler(app.Storage, app.Log))
-		//r.Post("/refresh-token", auth.RefreshTokenHandler(app.Storage, app.Log))
-		r.Post("/email-confirm", auth.EmailConfirmedHandler(app.Cache, app.Storage, app.Log))
-		r.Route("/email", func(r chi.Router) {
-			r.Use(httprate.Limit(1, 1*time.Minute, httprate.WithKeyFuncs(httprate.KeyByIP)))
-			r.Post("/send-confirm-code", auth.SendConfirmedEmailCodeHandler(app.Cache, app.EmailSender, app.Log))
-		})
-		r.Get("/{provider}", auth.OauthHandler(app.Cache, app.Log))
-		r.Get("/{provider}/callback", auth.OauthCallbackHandler(app.Storage, app.Cache, app.Log))
+	UserData := data.NewUserQuery(app.Log, app.Storage.Db, app.Cache)
+	UserService := services.NewUserUseCase(UserData, app.Log)
+	UserHandler := handlers.NewUserClient(app.Log, UserService)
+
+	app.Router.Route(apiVersion+"/auth", func(r chi.Router) {
+		r.Post("/sign-up", UserHandler.SignUp)
+		r.Post("/sign-in", UserHandler.SignIn)
+		r.Get("/{provider}", UserHandler.Oauth)
+		r.Get("/{provider}/callback", UserHandler.OauthCallback)
 	})
 
-	// Группа для пользовательских маршрутов (требует авторизации)
-	app.Router.Route("/user", func(r chi.Router) {
-		r.Use(jwtMiddleware)
-		r.Get("/avatar", profile.AvatarHandler(app.Log))
-		//r.Put("/complete-profile", profile.CompleteProfileHandler(app.Storage, app.Log))
-		//r.Get("/me", profile.ProfileHandler(app.Storage, app.Log))
-	})
+	//// Группа для пользовательских маршрутов (требует авторизации)
+	//app.Router.Route("/user", func(r chi.Router) {
+	//	r.Use(jwtMiddleware)
+	//	r.Get("/avatar", handlers.AvatarHandler(app.Log))
+	//	//r.Put("/complete-profile", profile.CompleteProfileHandler(app.Storage, app.Log))
+	//	//r.Get("/me", profile.ProfileHandler(app.Storage, app.Log))
+	//})
 
 	//// Группа для административных маршрутов
 	//app.Router.Route("/admin", func(r chi.Router) {
@@ -146,6 +147,12 @@ func (app *App) SetupRoutes() {
 	//})
 }
 
+// @title Offliner API
+// @version 1.0.0
+// @description API for online catalog of PC components.
+// @contact.name Evdokimov Igor
+// @contact.url https://t.me/epelptic
+// @BasePath /v1
 func main() {
 	cfg := config.MustLoad()
 	log := SetupLogger(cfg.Env)

@@ -9,136 +9,15 @@ const docTemplate = `{
     "info": {
         "description": "{{escape .Description}}",
         "title": "{{.Title}}",
-        "contact": {},
+        "contact": {
+            "name": "Evdokimov Igor",
+            "url": "https://t.me/epelptic"
+        },
         "version": "{{.Version}}"
     },
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/auth/email-confirm": {
-            "post": {
-                "description": "Validate confirmed code and is it confirmed update email_status",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "auth"
-                ],
-                "summary": "Confirmation email address",
-                "parameters": [
-                    {
-                        "description": "data for confirmed email",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/auth.EmailConfirmedRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Success email confirmation",
-                        "schema": {
-                            "$ref": "#/definitions/auth.UserSignUpResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Error email confirmation"
-                    },
-                    "500": {
-                        "description": "Internal server error",
-                        "schema": {
-                            "$ref": "#/definitions/auth.InternalServerErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/auth/email/send-confirm-code": {
-            "post": {
-                "description": "Генерирует код подтверждения и отправляет его на указанный email",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "auth"
-                ],
-                "summary": "Отправка кода подтверждения на email",
-                "parameters": [
-                    {
-                        "description": "Email пользователя для подтверждения",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/auth.SendConfirmedEmailCodeRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "201": {
-                        "description": "Код подтверждения успешно отправлен",
-                        "schema": {
-                            "$ref": "#/definitions/auth.UserSignUpResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Ошибка валидации или неверный запрос",
-                        "schema": {
-                            "$ref": "#/definitions/auth.ValidationErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Внутренняя ошибка сервера",
-                        "schema": {
-                            "$ref": "#/definitions/auth.InternalServerErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/auth/refresh-token": {
-            "post": {
-                "description": "Refreshes the access token using the provided refresh token from cookies.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "auth"
-                ],
-                "summary": "Refresh Access Token",
-                "responses": {
-                    "200": {
-                        "description": "Successfully refreshed access token",
-                        "schema": {
-                            "$ref": "#/definitions/auth.SingInResponse"
-                        }
-                    },
-                    "401": {
-                        "description": "Invalid or missing refresh token",
-                        "schema": {
-                            "$ref": "#/definitions/auth.UnauthorizedResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal server error",
-                        "schema": {
-                            "$ref": "#/definitions/auth.InternalServerErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
         "/auth/sign-in": {
             "post": {
                 "description": "Create access and refresh token and return them to the user",
@@ -149,9 +28,9 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "auth"
+                    "Authentication"
                 ],
-                "summary": "Sign In User",
+                "summary": "User SignIn",
                 "parameters": [
                     {
                         "description": "User login details",
@@ -159,7 +38,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/auth.SingInRequest"
+                            "$ref": "#/definitions/handlers.UserSingInRequest"
                         }
                     }
                 ],
@@ -167,31 +46,31 @@ const docTemplate = `{
                     "200": {
                         "description": "User successfully signed in",
                         "schema": {
-                            "$ref": "#/definitions/auth.SingInResponse"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "400": {
                         "description": "Invalid request payload or validation error",
                         "schema": {
-                            "$ref": "#/definitions/auth.ValidationErrorResponse"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "401": {
                         "description": "Invalid Password or Email",
                         "schema": {
-                            "$ref": "#/definitions/auth.ErrorResponse"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "403": {
                         "description": "User email is not confirmed",
                         "schema": {
-                            "$ref": "#/definitions/auth.ErrorResponse"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/auth.InternalServerErrorResponse"
+                            "$ref": "#/definitions/response.Response"
                         }
                     }
                 }
@@ -199,7 +78,7 @@ const docTemplate = `{
         },
         "/auth/sign-up": {
             "post": {
-                "description": "Creates a new user account with the provided details.",
+                "description": "Registers a new user with the provided email and password. On success, returns access and refresh tokens.",
                 "consumes": [
                     "application/json"
                 ],
@@ -207,9 +86,9 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "auth"
+                    "Authentication"
                 ],
-                "summary": "Sign Up User",
+                "summary": "User SignUp",
                 "parameters": [
                     {
                         "description": "User registration details",
@@ -217,33 +96,33 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/auth.UserSignUpRequest"
+                            "$ref": "#/definitions/handlers.UserSignUpRequest"
                         }
                     }
                 ],
                 "responses": {
                     "201": {
-                        "description": "User successfully registered",
+                        "description": "User successfully created",
                         "schema": {
-                            "$ref": "#/definitions/auth.UserSignUpResponse"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "400": {
-                        "description": "Invalid request payload or validation error",
+                        "description": "Validation error or invalid request payload",
                         "schema": {
-                            "$ref": "#/definitions/auth.ValidationErrorResponse"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "409": {
-                        "description": "User with this email already exists",
+                        "description": "Conflict - User with this email already exists",
                         "schema": {
-                            "$ref": "#/definitions/auth.ConflictErrorResponse"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/auth.InternalServerErrorResponse"
+                            "$ref": "#/definitions/response.Response"
                         }
                     }
                 }
@@ -259,14 +138,14 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "auth"
+                    "Authentication"
                 ],
-                "summary": "Start OAuth2 Authorization",
+                "summary": "User SignWithOauth",
                 "parameters": [
                     {
                         "type": "string",
-                        "example": "\"google or yandex\"",
-                        "description": "OAuth provider",
+                        "example": "\"google\" or \"yandex\"",
+                        "description": "OAuth provider DON'T WORK IN SWAGGER!!!",
                         "name": "provider",
                         "in": "path",
                         "required": true
@@ -274,31 +153,26 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "307": {
-                        "description": "Перенаправление к провайдеру"
+                        "description": "Redirecting to provider"
                     },
-                    "404": {
+                    "400": {
                         "description": "Provider not supported",
                         "schema": {
-                            "$ref": "#/definitions/auth.NotSupportedProviderResponse"
+                            "$ref": "#/definitions/response.Response"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/auth.InternalServerErrorResponse"
+                            "$ref": "#/definitions/response.Response"
                         }
                     }
                 }
             }
         },
-        "/user/avatar": {
+        "/auth/{provider}/callback": {
             "get": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "Retrieves the avatar image based on the filename provided in the query parameter.",
+                "description": "Handles the callback from the OAuth provider after the user has authorized the app. THIS ENDPOINT IS CALLED BY THE OAUTH PROVIDER, NOT THE FRONTEND!!!",
                 "consumes": [
                     "application/json"
                 ],
@@ -306,66 +180,58 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "profile"
+                    "Authentication"
                 ],
-                "summary": "Get User Avatar",
+                "summary": "OAuth2 Callback Handler",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Filename of the avatar image",
-                        "name": "filename",
+                        "example": "\"google\" or \"yandex\"",
+                        "description": "OAuth provider",
+                        "name": "provider",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "example": "\"randomstate123\"",
+                        "description": "State parameter sent during OAuth authorization",
+                        "name": "state",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "example": "\"authorizationcode123\"",
+                        "description": "Authorization code returned by OAuth provider",
+                        "name": "code",
                         "in": "query",
                         "required": true
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "Avatar image",
+                        "description": "User already exists, successfully authenticated",
                         "schema": {
-                            "type": "file"
+                            "$ref": "#/definitions/response.Response"
                         }
-                    }
-                }
-            }
-        },
-        "/user/complete-profile": {
-            "put": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "Updates user profile details such as name, surname, patronymic, date of birth, phone number, gender, and avatar.",
-                "consumes": [
-                    "multipart/form-data"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "profile"
-                ],
-                "summary": "Update User Profile",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "User profile data JSON",
-                        "name": "json",
-                        "in": "formData",
-                        "required": true
                     },
-                    {
-                        "type": "file",
-                        "description": "Avatar image file",
-                        "name": "avatar",
-                        "in": "formData"
-                    }
-                ],
-                "responses": {
                     "201": {
-                        "description": "User updated successfully",
+                        "description": "New user created and successfully authenticated",
                         "schema": {
-                            "$ref": "#/definitions/profile.CompleteProfileResponse"
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Provider not supported or invalid state",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
                         }
                     }
                 }
@@ -373,88 +239,7 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "auth.ConflictErrorResponse": {
-            "type": "object",
-            "properties": {
-                "error": {
-                    "type": "string",
-                    "example": "user with this email already sign-up"
-                },
-                "status": {
-                    "type": "string",
-                    "example": "Error"
-                }
-            }
-        },
-        "auth.EmailConfirmedRequest": {
-            "type": "object",
-            "required": [
-                "code",
-                "email"
-            ],
-            "properties": {
-                "code": {
-                    "type": "string",
-                    "example": "54JK64"
-                },
-                "email": {
-                    "type": "string",
-                    "example": "jon.doe@gmail.com"
-                }
-            }
-        },
-        "auth.ErrorResponse": {
-            "type": "object",
-            "properties": {
-                "error": {
-                    "type": "string",
-                    "example": "Invalid Password or Email"
-                },
-                "status": {
-                    "type": "string",
-                    "example": "Error"
-                }
-            }
-        },
-        "auth.InternalServerErrorResponse": {
-            "type": "object",
-            "properties": {
-                "error": {
-                    "type": "string",
-                    "example": "failed to sign up"
-                },
-                "status": {
-                    "type": "string",
-                    "example": "Error"
-                }
-            }
-        },
-        "auth.NotSupportedProviderResponse": {
-            "type": "object",
-            "properties": {
-                "error": {
-                    "type": "string",
-                    "example": "provider not supported"
-                },
-                "status": {
-                    "type": "string",
-                    "example": "Error"
-                }
-            }
-        },
-        "auth.SendConfirmedEmailCodeRequest": {
-            "type": "object",
-            "required": [
-                "email"
-            ],
-            "properties": {
-                "email": {
-                    "type": "string",
-                    "example": "jon.doe@gmail.com"
-                }
-            }
-        },
-        "auth.SingInRequest": {
+        "handlers.UserSignUpRequest": {
             "type": "object",
             "required": [
                 "email",
@@ -471,33 +256,7 @@ const docTemplate = `{
                 }
             }
         },
-        "auth.SingInResponse": {
-            "type": "object",
-            "properties": {
-                "access_token": {
-                    "type": "string",
-                    "example": "asdfasdfahgwea94i5)()(\u0026_.KJFDI{.sadfasdIOSDJ"
-                },
-                "status": {
-                    "type": "string",
-                    "example": "OK"
-                }
-            }
-        },
-        "auth.UnauthorizedResponse": {
-            "type": "object",
-            "properties": {
-                "error": {
-                    "type": "string",
-                    "example": "unauthorized"
-                },
-                "status": {
-                    "type": "string",
-                    "example": "error"
-                }
-            }
-        },
-        "auth.UserSignUpRequest": {
+        "handlers.UserSingInRequest": {
             "type": "object",
             "required": [
                 "email",
@@ -514,57 +273,32 @@ const docTemplate = `{
                 }
             }
         },
-        "auth.UserSignUpResponse": {
+        "response.Response": {
+            "description": "Structure for a standard API response",
             "type": "object",
             "properties": {
-                "status": {
-                    "type": "string",
-                    "example": "OK"
-                }
-            }
-        },
-        "auth.ValidationErrorResponse": {
-            "type": "object",
-            "properties": {
+                "data": {},
                 "error": {
                     "type": "string",
-                    "example": "field Email is not a valid Email, field Password is a required field"
+                    "example": "any error"
                 },
                 "status": {
                     "type": "string",
-                    "example": "Error"
+                    "example": "success/error"
                 }
             }
-        },
-        "profile.CompleteProfileResponse": {
-            "type": "object",
-            "properties": {
-                "message": {
-                    "type": "string"
-                },
-                "status": {
-                    "type": "string"
-                }
-            }
-        }
-    },
-    "securityDefinitions": {
-        "ApiKeyAuth": {
-            "type": "apiKey",
-            "name": "Authorization",
-            "in": "header"
         }
     }
 }`
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
-	Version:          "1.0",
-	Host:             "localhost:8080",
-	BasePath:         "/",
+	Version:          "1.0.0",
+	Host:             "",
+	BasePath:         "/v1",
 	Schemes:          []string{},
 	Title:            "Offliner API",
-	Description:      "REST API для приложения Offliner",
+	Description:      "API for online catalog of PC components.",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",
