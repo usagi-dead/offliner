@@ -1,69 +1,174 @@
 package main
 
 import (
-	"encoding/json"
+	"context"
+	"errors"
+	"fmt"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	// "github.com/go-chi/httprate"
+	swag "github.com/swaggo/http-swagger/v2"
 	"log/slog"
 	"net/http"
 	"os"
-	"server/Iternal/Storage"
-	"server/Iternal/config"
-	"server/Iternal/http-server/handlers/auth"
-	middleJWT "server/Iternal/http-server/middleware/jwt"
-	middlelog "server/Iternal/http-server/middleware/logger"
+	"os/signal"
+	"server/api/lib/emailsender"
+	// middleJWT "server/api/middleware/jwt"
+	middlelog "server/api/middleware/logger"
+	_ "server/docs"
+	"server/internal/cache"
+	"server/internal/config"
+	"server/internal/features/user/data"
+	"server/internal/features/user/handlers"
+	"server/internal/features/user/services"
+	"server/internal/storage"
+	"syscall"
+	"time"
 )
 
-func main() {
+type App struct {
+	Storage     *storage.Storage
+	Cache       *cache.Cache
+	EmailSender *emailsender.EmailSender
+	Router      chi.Router
+	Log         *slog.Logger
+	Cfg         *config.Config
+}
 
-	cfg := config.MustLoad()
+func NewApp(cfg *config.Config, log *slog.Logger) (*App, error) {
 
-	log := SetupLogger(cfg.Env)
-
-	storage, err := Storage.New(cfg.DbConfig)
+	Storage, err := storage.NewStorage(cfg.DbConfig)
 	if err != nil {
-		log.Error("db init field: " + err.Error())
-		os.Exit(1)
+		return nil, fmt.Errorf("db init failed: %w", err)
+	}
+
+	if err := Storage.ApplyMigrations(cfg.DbConfig); err != nil {
+		return nil, fmt.Errorf("apply migrations failed: %w", err)
+	}
+
+	Cache, err := cache.New(cfg.CacheConfig)
+	if err != nil {
+		return nil, fmt.Errorf("cache init failed: %w", err)
+	}
+
+	eSender, err := emailsender.New()
+	if err != nil {
+		return nil, fmt.Errorf("email sender init failed: %w", err)
 	}
 
 	router := chi.NewRouter()
+	return &App{Storage: Storage, Cache: Cache, EmailSender: eSender, Router: router, Log: log, Cfg: cfg}, nil
+}
 
-	router.Use(middleware.RequestID)
-	router.Use(middlelog.New(log))
-	router.Use(middleware.Recoverer)
-	router.Use(middleware.URLFormat)
+func (app *App) Start() error {
+	srv := &http.Server{
+		Addr:         app.Cfg.HttpServerConfig.Address,
+		Handler:      app.Router,
+		ReadTimeout:  app.Cfg.HttpServerConfig.Timeout,
+		WriteTimeout: app.Cfg.HttpServerConfig.Timeout,
+		IdleTimeout:  app.Cfg.HttpServerConfig.IdleTimeout,
+	}
 
-	router.Post("/auth/sign-up", auth.SignUpHandler(storage, log))
-	router.Post("/auth/sign-in", auth.SignInHandler(storage, log))
-	router.Get("/auth/refresh-token", auth.RefreshTokenHandler(storage, log))
-	router.Get("/auth/{provider}", auth.OauthHandler)
-	router.Get("/auth/{provider}/callback", auth.OauthCallbackHandler(log))
+	go func() {
+		if err := srv.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
+			app.Log.Error("server error", slog.String("error", err.Error()))
+		}
+	}()
 
-	router.Group(func(r chi.Router) {
-		r.Use(middleJWT.New(log))
-		r.Get("/profile", func(w http.ResponseWriter, r *http.Request) {
-			w.Header().Set("Content-Type", "application/json")
-			json.NewEncoder(w).Encode(map[string]string{
-				"hello": "world!",
-			})
-		})
+	app.Log.Info("server started", slog.String("Addr", app.Cfg.HttpServerConfig.Address))
+	app.Log.Info("docs " + "http://localhost:8080/swagger/index.html#/")
+
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+
+	<-quit
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	if err := srv.Shutdown(ctx); err != nil {
+		return fmt.Errorf("server shutdown failed: %w", err)
+	}
+
+	app.Log.Info("server stopped gracefully")
+	return nil
+}
+
+func (app *App) SetupRoutes() {
+
+	app.Router.Use(
+		middleware.Recoverer,
+		middleware.RequestID,
+		middlelog.New(app.Log),
+		middleware.URLFormat,
+	)
+
+	// var jwtMiddleware = middleJWT.New(app.Log)
+
+	//Swagger UI endpoint
+	app.Router.Get("/swagger/*", swag.Handler(
+		swag.URL("http://localhost:8080/swagger/doc.json"),
+	))
+
+	apiVersion := "/v1"
+
+	// Группа для аунтификации
+	UserData := data.NewUserQuery(app.Log, app.Storage.Db, app.Cache)
+	UserService := services.NewUserUseCase(UserData, app.Log)
+	UserHandler := handlers.NewUserClient(app.Log, UserService)
+
+	app.Router.Route(apiVersion+"/auth", func(r chi.Router) {
+		r.Post("/sign-up", UserHandler.SignUp)
+		r.Post("/sign-in", UserHandler.SignIn)
+		r.Get("/{provider}", UserHandler.Oauth)
+		r.Get("/{provider}/callback", UserHandler.OauthCallback)
 	})
 
-	log.Info("server starting", slog.String("Addr", cfg.HttpServer.Address))
+	//// Группа для пользовательских маршрутов (требует авторизации)
+	//app.Router.Route("/user", func(r chi.Router) {
+	//	r.Use(jwtMiddleware)
+	//	r.Get("/avatar", handlers.AvatarHandler(app.Log))
+	//	//r.Put("/complete-profile", profile.CompleteProfileHandler(app.Storage, app.Log))
+	//	//r.Get("/me", profile.ProfileHandler(app.Storage, app.Log))
+	//})
 
-	srv := &http.Server{
-		Addr:         cfg.HttpServer.Address,
-		Handler:      router,
-		ReadTimeout:  cfg.HttpServer.Timeout,
-		WriteTimeout: cfg.HttpServer.Timeout,
-		IdleTimeout:  cfg.HttpServer.IdleTimeout,
+	//// Группа для административных маршрутов
+	//app.Router.Route("/admin", func(r chi.Router) {
+	//	r.Use(middleJWT.New(app.Log))
+	//	//r.Use(middleAdmin)
+	//})
+	//
+	////Группа маршутов для супперадминов для создание админов
+	//app.Router.Group(func(r chi.Router) {
+	//	r.Use(middleJWT.New(app.Log))
+	//	//r.Use(WhiteIpList(WhiteList)
+	//	//r.Use(middleSuperAdmin)
+	//	//r.Post("/admin/create", auth.CrateAdminHandler(app.Storage, app.Log))
+	//})
+}
+
+// @title Offliner API
+// @version 1.0.0
+// @description API for online catalog of PC components.
+// @contact.name Evdokimov Igor
+// @contact.url https://t.me/epelptic
+// @BasePath /v1
+func main() {
+	cfg := config.MustLoad()
+	log := SetupLogger(cfg.Env)
+
+	app, err := NewApp(cfg, log)
+	if err != nil {
+		log.Error("app init failed", slog.String("error", err.Error()))
+		os.Exit(1)
 	}
 
-	if err = srv.ListenAndServe(); err != nil {
-		log.Error("http server error: " + err.Error())
-	}
+	app.SetupRoutes()
 
-	log.Info("server stopped")
+	if err := app.Start(); err != nil {
+		log.Error("server error", slog.String("error", err.Error()))
+		os.Exit(1)
+	}
 }
 
 func SetupLogger(env string) (log *slog.Logger) {
