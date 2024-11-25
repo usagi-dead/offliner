@@ -27,18 +27,3 @@ func New(cfg config.CacheConfig) (*Cache, error) {
 
 	return &Cache{client, cfg.StateExpiration, cfg.EmailConfirmedCodeExpiration}, nil
 }
-
-//func (c Cache) CreateEmailConfirmedCode(email string, code string) (string, error) {
-//	if err := c.db.Set(context.Background(), email, code, c.emailConfirmedCodeExpiration).Err(); err != nil {
-//		return "", fmt.Errorf("email code set cached err: %v", err)
-//	}
-//	return code, nil
-//}
-//
-//func (c Cache) GetEmailConfirmedCode(email string) (string, error) {
-//	code, err := c.db.Get(context.Background(), email).Result()
-//	if err != nil {
-//		return "", fmt.Errorf("email code get cached err: %v", err)
-//	}
-//	return code, nil
-//}

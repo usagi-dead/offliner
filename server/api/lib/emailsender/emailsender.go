@@ -4,14 +4,19 @@ import (
 	"fmt"
 	"gopkg.in/gomail.v2"
 	"os"
+	"server/internal/config"
 )
+
+type EmailSenderService interface {
+	SendConfirmEmail(code string, email string) error
+}
 
 type EmailSender struct {
 	SmtpServer *gomail.Dialer
 }
 
-func New() (*EmailSender, error) {
-	d := gomail.NewDialer("smtp.yandex.ru", 465, "OfflinerMen@yandex.by", os.Getenv("YANDEX_EMAIL_PASSWORD"))
+func New(cfg config.SMTPConfig) (*EmailSender, error) {
+	d := gomail.NewDialer(cfg.Host, cfg.Port, cfg.Username, os.Getenv("YANDEX_EMAIL_PASSWORD"))
 	conn, err := d.Dial()
 	if err != nil {
 		return nil, fmt.Errorf("failed to connect to SMTP server: %w", err)

@@ -236,9 +236,130 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/confirm/email": {
+            "put": {
+                "description": "Validate confirmed code and is it confirmed update email_status",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Confirmations"
+                ],
+                "summary": "Confirmation email address",
+                "parameters": [
+                    {
+                        "description": "data for confirmed email",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handlers.EmailConfirmedRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success email confirmation",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Error email confirmation",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/confirm/send-email-code": {
+            "post": {
+                "description": "Generate code for confirmation email and send this to email",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Confirmations"
+                ],
+                "summary": "Send code for confirmation email",
+                "parameters": [
+                    {
+                        "description": "Email пользователя для подтверждения",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handlers.SendConfirmedEmailCodeRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Код подтверждения успешно отправлен",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Ошибка валидации или неверный запрос",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Внутренняя ошибка сервера",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
+        "handlers.EmailConfirmedRequest": {
+            "type": "object",
+            "required": [
+                "code",
+                "email"
+            ],
+            "properties": {
+                "code": {
+                    "type": "string",
+                    "example": "54JK64"
+                },
+                "email": {
+                    "type": "string",
+                    "example": "jon.doe@gmail.com"
+                }
+            }
+        },
+        "handlers.SendConfirmedEmailCodeRequest": {
+            "type": "object",
+            "required": [
+                "email"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string",
+                    "example": "jon.doe@gmail.com"
+                }
+            }
+        },
         "handlers.UserSignUpRequest": {
             "type": "object",
             "required": [

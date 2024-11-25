@@ -47,19 +47,18 @@ func (uc *UserClient) SignIn(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		switch {
 		case errors.Is(err, user.ErrUserNotFound):
-			w.WriteHeader(http.StatusNotFound)
+			w.WriteHeader(http.StatusUnauthorized)
 			render.JSON(w, r, resp.Error("failed email or password"))
-		case errors.Is(err, user.ErrUserNotFound):
+		case errors.Is(err, user.ErrEmailNotConfirmed):
 			w.WriteHeader(http.StatusForbidden)
 			render.JSON(w, r, resp.Error("email not confirmed"))
 		default:
+			log.Error("failed to sign in", err)
 			w.WriteHeader(http.StatusInternalServerError)
 			render.JSON(w, r, resp.Error("internal server error"))
 		}
 		return
 	}
-
-	log.Info("sign in success", slog.String("email", req.Email))
 
 	http.SetCookie(w, &http.Cookie{
 		Name:     "refresh_token",

@@ -1,5 +1,25 @@
 basePath: /v1
 definitions:
+  handlers.EmailConfirmedRequest:
+    properties:
+      code:
+        example: 54JK64
+        type: string
+      email:
+        example: jon.doe@gmail.com
+        type: string
+    required:
+    - code
+    - email
+    type: object
+  handlers.SendConfirmedEmailCodeRequest:
+    properties:
+      email:
+        example: jon.doe@gmail.com
+        type: string
+    required:
+    - email
+    type: object
   handlers.UserSignUpRequest:
     properties:
       email:
@@ -192,4 +212,64 @@ paths:
       summary: User SignUp
       tags:
       - Authentication
+  /confirm/email:
+    put:
+      consumes:
+      - application/json
+      description: Validate confirmed code and is it confirmed update email_status
+      parameters:
+      - description: data for confirmed email
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.EmailConfirmedRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success email confirmation
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Error email confirmation
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Confirmation email address
+      tags:
+      - Confirmations
+  /confirm/send-email-code:
+    post:
+      consumes:
+      - application/json
+      description: Generate code for confirmation email and send this to email
+      parameters:
+      - description: Email пользователя для подтверждения
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.SendConfirmedEmailCodeRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Код подтверждения успешно отправлен
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Ошибка валидации или неверный запрос
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Внутренняя ошибка сервера
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Send code for confirmation email
+      tags:
+      - Confirmations
 swagger: "2.0"

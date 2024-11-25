@@ -75,10 +75,10 @@ func (uq *UserQuery) CreateOauthUser(user *u.User) (int64, error) {
 	return userID, nil
 }
 
-func (uq *UserQuery) GetUserByEmail(Email string) (*u.User, error) {
+func (uq *UserQuery) GetUserByEmail(email string) (*u.User, error) {
 	row := uq.db.QueryRow(context.Background(),
 		`SELECT * FROM users WHERE email = $1`,
-		Email,
+		email,
 	)
 
 	user := &u.User{}
@@ -129,4 +129,53 @@ func (uq *UserQuery) VerifyStateCode(state string) (bool, error) {
 	}
 
 	return false, nil
+}
+
+func (uq *UserQuery) CongirmEmail(email string) error {
+	_, err := uq.db.Exec(context.Background(),
+		`UPDATE users SET verified_email = true WHERE email = $1`,
+		email,
+	)
+
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return u.ErrUserNotFound
+		}
+		return err
+	}
+
+	return nil
+}
+
+func (uq *UserQuery) IsEmailConfirmed(email string) (bool, error) {
+	row := uq.db.QueryRow(context.Background(),
+		`SELECT verified_email FROM users WHERE email = $1`,
+		email,
+	)
+
+	var verified bool
+	err := row.Scan(&verified)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return false, u.ErrUserNotFound
+		}
+		return false, err
+	}
+
+	return verified, nil
+}
+
+func (uq *UserQuery) SaveEmailConfirmedCode(email string, code string) error {
+	if err := uq.ch.Db.Set(context.Background(), email, code, uq.ch.EmailConfirmedCodeExpiration).Err(); err != nil {
+		return fmt.Errorf("email code set cached err: %v", err)
+	}
+	return nil
+}
+
+func (uq *UserQuery) GetEmailConfirmedCode(email string) (string, error) {
+	code, err := uq.ch.Db.Get(context.Background(), email).Result()
+	if err != nil {
+		return "", fmt.Errorf("email code get cached err: %v", err)
+	}
+	return code, nil
 }

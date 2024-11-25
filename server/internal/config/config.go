@@ -12,6 +12,7 @@ type Config struct {
 	DbConfig         DbConfig         `yaml:"db"`
 	HttpServerConfig HttpServerConfig `yaml:"http_server"  env-required:"true"`
 	CacheConfig      CacheConfig      `yaml:"cache"`
+	SMTPConfig       SMTPConfig       `yaml:"smtp"`
 }
 
 type CacheConfig struct {
@@ -32,6 +33,12 @@ type DbConfig struct {
 	Address  string `yaml:"address"`
 	DbName   string `yaml:"db_name"`
 	Sslmode  string `yaml:"sslmode"`
+}
+
+type SMTPConfig struct {
+	Host     string `yaml:"host"`
+	Port     int    `yaml:"port"`
+	Username string `yaml:"username"`
 }
 
 func MustLoad() *Config {

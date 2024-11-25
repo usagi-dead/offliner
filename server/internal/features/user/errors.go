@@ -8,9 +8,11 @@ var (
 )
 
 var (
-	ErrInvalidState        = errors.New("invalid state")
-	ErrUserNotFound        = errors.New("user not found")
-	ErrEmailNotConfirmed   = errors.New("email not confirmed")
-	ErrUnsupportedProvider = errors.New("unsupported provider")
-	ErrDatabase            = errors.New("database error")
+	ErrInvalidState          = errors.New("invalid state")
+	ErrUserNotFound          = errors.New("user not found")
+	ErrEmailNotConfirmed     = errors.New("email not confirmed")
+	ErrUnsupportedProvider   = errors.New("unsupported provider")
+	ErrEmailAlreadyConfirmed = errors.New("email already confirmed")
+	ErrNotMatchConfirmCode   = errors.New("not match confirm code")
+	ErrDatabase              = errors.New("database error")
 )

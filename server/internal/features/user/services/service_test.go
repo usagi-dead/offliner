@@ -5,7 +5,9 @@ import (
 	"log/slog"
 	"net/http"
 	"os"
+	"server/api/lib/emailsender"
 	"server/api/lib/jwt"
+	"server/internal/config"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -16,6 +18,26 @@ import (
 
 type MockUserData struct {
 	mock.Mock
+}
+
+func (m *MockUserData) CongirmEmail(email string) error {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (m *MockUserData) IsEmailConfirmed(email string) (bool, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (m *MockUserData) SaveEmailConfirmedCode(email string, code string) error {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (m *MockUserData) GetEmailConfirmedCode(email string) (string, error) {
+	//TODO implement me
+	panic("implement me")
 }
 
 func (m *MockUserData) CreateUser(email string, hashedPassword string) (int64, error) {
@@ -67,7 +89,12 @@ func TestUserUseCase_SignUp(t *testing.T) {
 	mockRepo := new(MockUserData)
 	mockJWT := new(MockJWTService)
 	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
-	userUseCase := services.NewUserUseCase(mockRepo, mockJWT, logger)
+	es, _ := emailsender.New(config.SMTPConfig{
+		Host:     "smtp.yandex.ru",
+		Port:     465,
+		Username: "OfflinerMen@yandex.by",
+	})
+	userUseCase := services.NewUserUseCase(mockRepo, mockJWT, logger, es)
 
 	t.Run("success", func(t *testing.T) {
 		email := "test@example.com"
@@ -101,7 +128,12 @@ func TestUserUseCase_SignIn(t *testing.T) {
 	mockRepo := new(MockUserData)
 	mockJWT := new(MockJWTService)
 	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
-	userUseCase := services.NewUserUseCase(mockRepo, mockJWT, logger)
+	es, _ := emailsender.New(config.SMTPConfig{
+		Host:     "smtp.yandex.ru",
+		Port:     465,
+		Username: "OfflinerMen@yandex.by",
+	})
+	userUseCase := services.NewUserUseCase(mockRepo, mockJWT, logger, es)
 
 	t.Run("success", func(t *testing.T) {
 		email := "test@example.com"
@@ -182,4 +214,12 @@ func TestUserUseCase_SignIn(t *testing.T) {
 
 		mockRepo.AssertCalled(t, "GetUserByEmail", email)
 	})
+}
+
+func TestUserUseCase_oAuth(t *testing.T) {
+
+}
+
+func TestUserUseCase_GenerateEmailCode(t *testing.T) {
+
 }
