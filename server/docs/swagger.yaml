@@ -1,0 +1,195 @@
+basePath: /v1
+definitions:
+  handlers.UserSignUpRequest:
+    properties:
+      email:
+        example: jon.doe@gmail.com
+        type: string
+      password:
+        example: SuperPassword123
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  handlers.UserSingInRequest:
+    properties:
+      email:
+        example: jon.doe@gmail.com
+        type: string
+      password:
+        example: SuperPassword123
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  response.Response:
+    description: Structure for a standard API response
+    properties:
+      data: {}
+      error:
+        example: any error
+        type: string
+      status:
+        example: success/error
+        type: string
+    type: object
+info:
+  contact:
+    name: Evdokimov Igor
+    url: https://t.me/epelptic
+  description: API for online catalog of PC components.
+  title: Offliner API
+  version: 1.0.0
+paths:
+  /auth/{provider}:
+    get:
+      consumes:
+      - application/json
+      description: Redirects the user to the OAuth provider for authentication.
+      parameters:
+      - description: OAuth provider DON'T WORK IN SWAGGER!!!
+        example: '"google" or "yandex"'
+        in: path
+        name: provider
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "307":
+          description: Redirecting to provider
+        "400":
+          description: Provider not supported
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: User SignWithOauth
+      tags:
+      - Authentication
+  /auth/{provider}/callback:
+    get:
+      consumes:
+      - application/json
+      description: Handles the callback from the OAuth provider after the user has
+        authorized the app. THIS ENDPOINT IS CALLED BY THE OAUTH PROVIDER, NOT THE
+        FRONTEND!!!
+      parameters:
+      - description: OAuth provider
+        example: '"google" or "yandex"'
+        in: path
+        name: provider
+        required: true
+        type: string
+      - description: State parameter sent during OAuth authorization
+        example: '"randomstate123"'
+        in: query
+        name: state
+        required: true
+        type: string
+      - description: Authorization code returned by OAuth provider
+        example: '"authorizationcode123"'
+        in: query
+        name: code
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User already exists, successfully authenticated
+          schema:
+            $ref: '#/definitions/response.Response'
+        "201":
+          description: New user created and successfully authenticated
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Provider not supported or invalid state
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: OAuth2 Callback Handler
+      tags:
+      - Authentication
+  /auth/sign-in:
+    post:
+      consumes:
+      - application/json
+      description: Create access and refresh token and return them to the user
+      parameters:
+      - description: User login details
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.UserSingInRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User successfully signed in
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Invalid request payload or validation error
+          schema:
+            $ref: '#/definitions/response.Response'
+        "401":
+          description: Invalid Password or Email
+          schema:
+            $ref: '#/definitions/response.Response'
+        "403":
+          description: User email is not confirmed
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: User SignIn
+      tags:
+      - Authentication
+  /auth/sign-up:
+    post:
+      consumes:
+      - application/json
+      description: Registers a new user with the provided email and password. On success,
+        returns access and refresh tokens.
+      parameters:
+      - description: User registration details
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.UserSignUpRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: User successfully created
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Validation error or invalid request payload
+          schema:
+            $ref: '#/definitions/response.Response'
+        "409":
+          description: Conflict - User with this email already exists
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: User SignUp
+      tags:
+      - Authentication
+swagger: "2.0"
