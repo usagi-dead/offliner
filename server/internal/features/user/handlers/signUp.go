@@ -7,13 +7,12 @@ import (
 	"net/http"
 	resp "server/api/lib/response"
 	"server/internal/features/user"
-	"time"
 )
 
 // SignUp
 // @Summary User SignUp
 // @Tags Authentication
-// @Description Registers a new user with the provided email and password. On success, returns access and refresh tokens.
+// @Description Registers a new user with the provided email and password.
 // @Accept json
 // @Produce json
 // @Param user body handlers.UserSignUpRequest true "User registration details"
@@ -41,8 +40,7 @@ func (uc *UserClient) SignUp(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	AccessToken, RefreshToken, err := uc.us.SignUp(req.Email, req.Password)
-	if err != nil {
+	if err := uc.us.SignUp(req.Email, req.Password); err != nil {
 		switch {
 		case errors.Is(err, user.ErrEmailExists):
 			log.Info("email already exists", slog.String("email", req.Email))
@@ -56,15 +54,7 @@ func (uc *UserClient) SignUp(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	http.SetCookie(w, &http.Cookie{
-		Name:     "refresh_token",
-		Value:    RefreshToken,
-		Expires:  time.Now().Add(15 * 24 * time.Hour),
-		HttpOnly: true,
-		Path:     "/",
-	})
-
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
-	render.JSON(w, r, resp.AccessToken(AccessToken))
+	render.JSON(w, r, resp.OK())
 }

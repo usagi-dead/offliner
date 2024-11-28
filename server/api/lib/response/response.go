@@ -64,3 +64,9 @@ func ValidationError(err error) Response {
 		Error:  strings.Join(errMsgs, ", "),
 	}
 }
+
+func OK() Response {
+	return Response{
+		Status: StatusOK,
+	}
+}

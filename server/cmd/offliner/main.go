@@ -6,7 +6,9 @@ import (
 	"fmt"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
-	// "github.com/go-chi/httprate"
+	jwt2 "server/api/lib/jwt"
+
+	"github.com/go-chi/httprate"
 	swag "github.com/swaggo/http-swagger/v2"
 	"log/slog"
 	"net/http"
@@ -51,7 +53,7 @@ func NewApp(cfg *config.Config, log *slog.Logger) (*App, error) {
 		return nil, fmt.Errorf("cache init failed: %w", err)
 	}
 
-	eSender, err := emailsender.New()
+	eSender, err := emailsender.New(cfg.SMTPConfig)
 	if err != nil {
 		return nil, fmt.Errorf("email sender init failed: %w", err)
 	}
@@ -114,7 +116,7 @@ func (app *App) SetupRoutes() {
 
 	// Группа для аунтификации
 	UserData := data.NewUserQuery(app.Log, app.Storage.Db, app.Cache)
-	UserService := services.NewUserUseCase(UserData, app.Log)
+	UserService := services.NewUserUseCase(UserData, jwt2.NewJWTHandler(), app.Log, app.EmailSender)
 	UserHandler := handlers.NewUserClient(app.Log, UserService)
 
 	app.Router.Route(apiVersion+"/auth", func(r chi.Router) {
@@ -122,6 +124,14 @@ func (app *App) SetupRoutes() {
 		r.Post("/sign-in", UserHandler.SignIn)
 		r.Get("/{provider}", UserHandler.Oauth)
 		r.Get("/{provider}/callback", UserHandler.OauthCallback)
+	})
+
+	app.Router.Route(apiVersion+"/confirm", func(r chi.Router) {
+		r.Group(func(r chi.Router) {
+			r.Use(httprate.Limit(1, 1*time.Minute, httprate.WithKeyFuncs(httprate.KeyByIP)))
+			r.Post("/send-email-code", UserHandler.SendConfirmedEmailCode)
+		})
+		r.Put("/email", UserHandler.EmailConfirmed)
 	})
 
 	//// Группа для пользовательских маршрутов (требует авторизации)

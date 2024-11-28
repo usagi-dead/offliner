@@ -5,9 +5,9 @@ import (
 	u "server/internal/features/user"
 )
 
-func (uus *UserUseCase) SignIn(email string, password string) (string, string, error) {
+func (uuc *UserUseCase) SignIn(email string, password string) (string, string, error) {
 
-	user, err := uus.repo.GetUserByEmail(email)
+	user, err := uuc.repo.GetUserByEmail(email)
 	if err != nil {
 		return "", "", err
 	}
@@ -20,12 +20,12 @@ func (uus *UserUseCase) SignIn(email string, password string) (string, string, e
 		return "", "", u.ErrEmailNotConfirmed
 	}
 
-	accessToken, err := uus.jwt.GenerateAccessToken(user.UserId, user.Role)
+	accessToken, err := uuc.jwt.GenerateAccessToken(user.UserId, user.Role)
 	if err != nil {
 		return "", "", err
 	}
 
-	refreshToken, err := uus.jwt.GenerateRefreshToken(user.UserId)
+	refreshToken, err := uuc.jwt.GenerateRefreshToken(user.UserId)
 	if err != nil {
 		return "", "", err
 	}
