@@ -27,6 +27,7 @@ type UserHandler interface {
 	OauthCallback(w http.ResponseWriter, r *http.Request)
 	SendConfirmedEmailCode(w http.ResponseWriter, r *http.Request)
 	EmailConfirmed(w http.ResponseWriter, r *http.Request)
+	RefreshToken(w http.ResponseWriter, r *http.Request)
 }
 
 type UserService interface {
@@ -36,6 +37,7 @@ type UserService interface {
 	Callback(provider, state, code string) (bool, string, string, error)
 	SendEmailForConfirmed(email string) error
 	EmailConfirmed(email string, code string) error
+	RefreshToken(r *http.Request) (string, error)
 }
 
 type UserData interface {
@@ -48,4 +50,5 @@ type UserData interface {
 	IsEmailConfirmed(email string) (bool, error)
 	SaveEmailConfirmedCode(email string, code string) error
 	GetEmailConfirmedCode(email string) (string, error)
+	GetUserById(userId int64) (*User, error)
 }

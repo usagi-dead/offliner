@@ -5,8 +5,8 @@ import (
 	u "server/internal/features/user"
 )
 
-func (uuc *UserUseCase) EmailConfirmed(email string, code string) error {
-	ok, err := uuc.repo.IsEmailConfirmed(email)
+func (uus *UserUseCase) EmailConfirmed(email string, code string) error {
+	ok, err := uus.repo.IsEmailConfirmed(email)
 	if err != nil {
 		if errors.Is(err, u.ErrUserNotFound) {
 			return u.ErrUserNotFound
@@ -17,7 +17,7 @@ func (uuc *UserUseCase) EmailConfirmed(email string, code string) error {
 		return u.ErrEmailAlreadyConfirmed
 	}
 
-	realCode, err := uuc.repo.GetEmailConfirmedCode(email)
+	realCode, err := uus.repo.GetEmailConfirmedCode(email)
 	if err != nil {
 		return err
 	}
@@ -26,7 +26,7 @@ func (uuc *UserUseCase) EmailConfirmed(email string, code string) error {
 		return u.ErrInvalidConfirmCode
 	}
 
-	if err := uuc.repo.CongirmEmail(email); err != nil {
+	if err := uus.repo.CongirmEmail(email); err != nil {
 		return err
 	}
 

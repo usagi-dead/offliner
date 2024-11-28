@@ -139,6 +139,30 @@ paths:
       summary: OAuth2 Callback Handler
       tags:
       - Authentication
+  /auth/refresh-token:
+    post:
+      consumes:
+      - application/json
+      description: Refreshes the access token using the provided refresh token from
+        cookies.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully refreshed access token
+          schema:
+            $ref: '#/definitions/response.Response'
+        "401":
+          description: Invalid, missing or expired refresh token
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Refresh Access Token
+      tags:
+      - Authentication
   /auth/sign-in:
     post:
       consumes:
@@ -272,4 +296,9 @@ paths:
       summary: Send code for confirmation email
       tags:
       - Confirmations
+securityDefinitions:
+  BearerAuth:
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"

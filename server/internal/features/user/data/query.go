@@ -108,6 +108,39 @@ func (uq *UserQuery) GetUserByEmail(email string) (*u.User, error) {
 	return user, nil
 }
 
+func (uq *UserQuery) GetUserById(userId int64) (*u.User, error) {
+	row := uq.db.QueryRow(context.Background(),
+		`SELECT * FROM users WHERE user_id = $1`,
+		userId,
+	)
+
+	user := &u.User{}
+
+	err := row.Scan(
+		&user.UserId,
+		&user.HashedPassword,
+		&user.Role,
+		&user.Surname,
+		&user.Name,
+		&user.Patronymic,
+		&user.DateOfBirth,
+		&user.PhoneNumber,
+		&user.Email,
+		&user.AvatarUrl,
+		&user.VerifiedEmail,
+		&user.Gender,
+	)
+
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, u.ErrUserNotFound
+		}
+		return nil, err
+	}
+
+	return user, nil
+}
+
 func (uq *UserQuery) SaveStateCode(state string) error {
 	if err := uq.ch.Db.Set(context.Background(), state, "true", uq.ch.StateExpiration).Err(); err != nil {
 		return fmt.Errorf("state token set cached err: %v", err)

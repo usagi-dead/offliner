@@ -116,12 +116,13 @@ func (app *App) SetupRoutes() {
 
 	// Группа для аунтификации
 	UserData := data.NewUserQuery(app.Log, app.Storage.Db, app.Cache)
-	UserService := services.NewUserUseCase(UserData, jwt2.NewJWTHandler(), app.Log, app.EmailSender)
+	UserService := services.NewUserUseCase(UserData, jwt2.NewJWTHandler(&app.Cfg.JWTConfig), app.Log, app.EmailSender)
 	UserHandler := handlers.NewUserClient(app.Log, UserService)
 
 	app.Router.Route(apiVersion+"/auth", func(r chi.Router) {
 		r.Post("/sign-up", UserHandler.SignUp)
 		r.Post("/sign-in", UserHandler.SignIn)
+		r.Post("/refresh-token", UserHandler.RefreshToken)
 		r.Get("/{provider}", UserHandler.Oauth)
 		r.Get("/{provider}/callback", UserHandler.OauthCallback)
 	})
@@ -134,13 +135,13 @@ func (app *App) SetupRoutes() {
 		r.Put("/email", UserHandler.EmailConfirmed)
 	})
 
-	//// Группа для пользовательских маршрутов (требует авторизации)
-	//app.Router.Route("/user", func(r chi.Router) {
-	//	r.Use(jwtMiddleware)
-	//	r.Get("/avatar", handlers.AvatarHandler(app.Log))
-	//	//r.Put("/complete-profile", profile.CompleteProfileHandler(app.Storage, app.Log))
-	//	//r.Get("/me", profile.ProfileHandler(app.Storage, app.Log))
-	//})
+	// Группа для пользовательских маршрутов (требует авторизации)
+	app.Router.Route("/user", func(r chi.Router) {
+		//r.Use(jwtMiddleware)
+		//r.Get("/avatar", handlers.AvatarHandler(app.Log))
+		//r.Put("/complete-profile", profile.CompleteProfileHandler(app.Storage, app.Log))
+		//r.Get("/profile", profile.ProfileHandler(app.Storage, app.Log))
+	})
 
 	//// Группа для административных маршрутов
 	//app.Router.Route("/admin", func(r chi.Router) {
@@ -163,6 +164,9 @@ func (app *App) SetupRoutes() {
 // @contact.name Evdokimov Igor
 // @contact.url https://t.me/epelptic
 // @BasePath /v1
+// @securityDefinitions.apikey BearerAuth
+// @in header
+// @name Authorization
 func main() {
 	cfg := config.MustLoad()
 	log := SetupLogger(cfg.Env)

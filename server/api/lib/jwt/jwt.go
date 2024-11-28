@@ -1,11 +1,12 @@
 package jwt
 
 import (
-	"errors"
 	"fmt"
 	"github.com/golang-jwt/jwt/v5"
 	"net/http"
 	"os"
+	"server/internal/config"
+	u "server/internal/features/user"
 	"strings"
 	"time"
 )
@@ -17,10 +18,14 @@ type JWTService interface {
 	ValidateJWT(token string) (*Claims, error)
 }
 
-type JWTHandler struct{}
+type JWTHandler struct {
+	cfg *config.JWTConfig
+}
 
-func NewJWTHandler() *JWTHandler {
-	return &JWTHandler{}
+func NewJWTHandler(cfg *config.JWTConfig) *JWTHandler {
+	return &JWTHandler{
+		cfg: cfg,
+	}
 }
 
 type Claims struct {
@@ -34,7 +39,7 @@ func (j *JWTHandler) GenerateAccessToken(UserID int64, Role string) (string, err
 		UserId: UserID,
 		Role:   Role,
 		RegisteredClaims: jwt.RegisteredClaims{
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(30 * time.Minute)),
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(j.cfg.AccessExpire)),
 		},
 	}
 
@@ -46,7 +51,7 @@ func (j *JWTHandler) GenerateRefreshToken(UserID int64) (string, error) {
 	claims := &Claims{
 		UserId: UserID,
 		RegisteredClaims: jwt.RegisteredClaims{
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(15 * 24 * time.Hour)),
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(j.cfg.RefreshExpire)),
 		},
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
@@ -57,11 +62,11 @@ func (j *JWTHandler) ExtractJWTFromHeader(r *http.Request) (string, error) {
 	authHeader := r.Header.Get("Authorization")
 
 	if authHeader == "" {
-		return "", errors.New("no authorization header")
+		return "", u.ErrNoAccessToken
 	}
 
 	if !strings.HasPrefix(authHeader, "Bearer ") {
-		return "", errors.New("invalid authorization header")
+		return "", u.ErrInvalidToken
 	}
 
 	return authHeader[7:], nil
@@ -76,14 +81,14 @@ func (j *JWTHandler) ValidateJWT(JWTToken string) (*Claims, error) {
 	})
 	if err != nil {
 		if strings.Contains(err.Error(), "is expired") {
-			return nil, errors.New("token expired")
+			return nil, u.ErrExpiredToken
 		}
 		return nil, err
 	}
 
 	claims, ok := token.Claims.(*Claims)
 	if !ok || !token.Valid {
-		return nil, errors.New("invalid token")
+		return nil, u.ErrInvalidToken
 	}
 
 	return claims, nil

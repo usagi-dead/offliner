@@ -5,10 +5,10 @@ import (
 	"log/slog"
 	"net/http"
 	ck "server/api/lib/contextKeys"
-	"server/api/lib/jwt"
+	j "server/api/lib/jwt"
 )
 
-func New(log *slog.Logger) func(next http.Handler) http.Handler {
+func New(log *slog.Logger, jwt j.JWTService) func(next http.Handler) http.Handler {
 	const op string = "jwt-middleware"
 	log = log.With(
 		slog.String("op", op),

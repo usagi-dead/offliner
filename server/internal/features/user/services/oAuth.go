@@ -47,14 +47,14 @@ type YandexUserData struct {
 	PhoneNumber *string `json:"default_phone.number"`
 }
 
-func (uuc *UserUseCase) GetAuthURL(provider string) (string, error) {
+func (uus *UserUseCase) GetAuthURL(provider string) (string, error) {
 	config, ok := oauthConfigs[provider]
 	if !ok {
 		return "", u.ErrUnsupportedProvider
 	}
 
 	state := uuid.NewString()
-	err := uuc.repo.SaveStateCode(state)
+	err := uus.repo.SaveStateCode(state)
 	if err != nil {
 		return "", fmt.Errorf("failed to save state: %w", err)
 	}
@@ -62,13 +62,13 @@ func (uuc *UserUseCase) GetAuthURL(provider string) (string, error) {
 	return config.AuthCodeURL(state, oauth2.AccessTypeOnline), nil
 }
 
-func (uuc *UserUseCase) Callback(provider, state, code string) (bool, string, string, error) {
+func (uus *UserUseCase) Callback(provider, state, code string) (bool, string, string, error) {
 	config, ok := oauthConfigs[provider]
 	if !ok {
 		return false, "", "", u.ErrUnsupportedProvider
 	}
 
-	isValidState, err := uuc.repo.VerifyStateCode(state)
+	isValidState, err := uus.repo.VerifyStateCode(state)
 	if err != nil || !isValidState {
 		return false, "", "", u.ErrInvalidState
 	}
@@ -84,19 +84,19 @@ func (uuc *UserUseCase) Callback(provider, state, code string) (bool, string, st
 		return false, "", "", err
 	}
 
-	existingUser, err := uuc.repo.GetUserByEmail(user.Email)
+	existingUser, err := uus.repo.GetUserByEmail(user.Email)
 	if errors.Is(err, u.ErrUserNotFound) {
-		userID, err := uuc.repo.CreateOauthUser(user)
+		userID, err := uus.repo.CreateOauthUser(user)
 		if err != nil {
 			return false, "", "", err
 		}
 
-		accessToken, err := uuc.jwt.GenerateAccessToken(userID, "user")
+		accessToken, err := uus.jwt.GenerateAccessToken(userID, "user")
 		if err != nil {
 			return false, "", "", err
 		}
 
-		refreshToken, err := uuc.jwt.GenerateRefreshToken(userID)
+		refreshToken, err := uus.jwt.GenerateRefreshToken(userID)
 		if err != nil {
 			return false, "", "", err
 		}
@@ -106,12 +106,12 @@ func (uuc *UserUseCase) Callback(provider, state, code string) (bool, string, st
 		return false, "", "", err
 	}
 
-	accessToken, err := uuc.jwt.GenerateAccessToken(existingUser.UserId, "user")
+	accessToken, err := uus.jwt.GenerateAccessToken(existingUser.UserId, "user")
 	if err != nil {
 		return false, "", "", err
 	}
 
-	refreshToken, err := uuc.jwt.GenerateRefreshToken(existingUser.UserId)
+	refreshToken, err := uus.jwt.GenerateRefreshToken(existingUser.UserId)
 	if err != nil {
 		return false, "", "", err
 	}
