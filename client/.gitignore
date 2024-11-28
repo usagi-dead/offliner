@@ -11,7 +11,7 @@ node_modules
 dist
 dist-ssr
 *.local
-gpu.js
+./src/gpu.js
 
 # Editor directories and files
 .idea/
