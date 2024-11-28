@@ -13,6 +13,6 @@ var (
 	ErrEmailNotConfirmed     = errors.New("email not confirmed")
 	ErrUnsupportedProvider   = errors.New("unsupported provider")
 	ErrEmailAlreadyConfirmed = errors.New("email already confirmed")
-	ErrNotMatchConfirmCode   = errors.New("not match confirm code")
+	ErrInvalidConfirmCode    = errors.New("invalid confirm code")
 	ErrDatabase              = errors.New("database error")
 )

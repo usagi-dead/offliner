@@ -1,13 +1,12 @@
 package services_test
 
 import (
+	"fmt"
 	"golang.org/x/crypto/bcrypt"
 	"log/slog"
 	"net/http"
 	"os"
-	"server/api/lib/emailsender"
 	"server/api/lib/jwt"
-	"server/internal/config"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -18,26 +17,46 @@ import (
 
 type MockUserData struct {
 	mock.Mock
+	emailConfirmationStatus map[string]bool
+	emailConfirmationCodes  map[string]string
+}
+
+func NewMockUserData() *MockUserData {
+	return &MockUserData{
+		emailConfirmationStatus: make(map[string]bool),
+		emailConfirmationCodes:  make(map[string]string),
+	}
 }
 
 func (m *MockUserData) CongirmEmail(email string) error {
-	//TODO implement me
-	panic("implement me")
+	if _, exists := m.emailConfirmationCodes[email]; !exists {
+		return fmt.Errorf("no confirmation code found for email: %s", email)
+	}
+	m.emailConfirmationStatus[email] = true
+	return nil
 }
 
 func (m *MockUserData) IsEmailConfirmed(email string) (bool, error) {
-	//TODO implement me
-	panic("implement me")
+	confirmed, exists := m.emailConfirmationStatus[email]
+	if !exists {
+		return false, user.ErrUserNotFound
+	}
+	return confirmed, nil
 }
 
 func (m *MockUserData) SaveEmailConfirmedCode(email string, code string) error {
-	//TODO implement me
-	panic("implement me")
+	m.emailConfirmationStatus[email] = false
+	m.emailConfirmationCodes[email] = code
+	return nil
 }
 
 func (m *MockUserData) GetEmailConfirmedCode(email string) (string, error) {
-	//TODO implement me
-	panic("implement me")
+
+	code, exists := m.emailConfirmationCodes[email]
+	if !exists {
+		return "", fmt.Errorf("no confirmation code found for email: %s", email)
+	}
+	return code, nil
 }
 
 func (m *MockUserData) CreateUser(email string, hashedPassword string) (int64, error) {
@@ -46,7 +65,8 @@ func (m *MockUserData) CreateUser(email string, hashedPassword string) (int64, e
 }
 
 func (m *MockUserData) CreateOauthUser(user *user.User) (int64, error) {
-	return 0, nil
+	args := m.Called(user)
+	return args.Get(0).(int64), args.Error(1)
 }
 
 func (m *MockUserData) GetUserByEmail(email string) (*user.User, error) {
@@ -85,15 +105,18 @@ func (m *MockJWTService) ExtractJWTFromHeader(r *http.Request) (string, error) {
 	return "", nil
 }
 
+type MockEmailSender struct{}
+
+func (m *MockEmailSender) SendConfirmEmail(email string, code string) error {
+	// Логика мока, просто возвращаем успех
+	return nil
+}
+
 func TestUserUseCase_SignUp(t *testing.T) {
 	mockRepo := new(MockUserData)
 	mockJWT := new(MockJWTService)
 	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
-	es, _ := emailsender.New(config.SMTPConfig{
-		Host:     "smtp.yandex.ru",
-		Port:     465,
-		Username: "OfflinerMen@yandex.by",
-	})
+	es := new(MockEmailSender)
 	userUseCase := services.NewUserUseCase(mockRepo, mockJWT, logger, es)
 
 	t.Run("success", func(t *testing.T) {
@@ -118,11 +141,7 @@ func TestUserUseCase_SignIn(t *testing.T) {
 	mockRepo := new(MockUserData)
 	mockJWT := new(MockJWTService)
 	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
-	es, _ := emailsender.New(config.SMTPConfig{
-		Host:     "smtp.yandex.ru",
-		Port:     465,
-		Username: "OfflinerMen@yandex.by",
-	})
+	es := new(MockEmailSender)
 	userUseCase := services.NewUserUseCase(mockRepo, mockJWT, logger, es)
 
 	t.Run("success", func(t *testing.T) {
@@ -206,18 +225,131 @@ func TestUserUseCase_SignIn(t *testing.T) {
 	})
 }
 
-func TestUserUseCase_oAuth(t *testing.T) {
-
-}
-
 func TestUserUseCase_EmailConfirmed(t *testing.T) {
+	mockRepo := NewMockUserData()
+	mockJWT := new(MockJWTService)
+	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
+	es := new(MockEmailSender)
+	userUseCase := services.NewUserUseCase(mockRepo, mockJWT, logger, es)
 
+	t.Run("success", func(t *testing.T) {
+		email := "test@example.com"
+		code := "asdfKD"
+		_ = mockRepo.SaveEmailConfirmedCode(email, code)
+
+		err := userUseCase.EmailConfirmed(email, code)
+
+		assert.NoError(t, err)
+	})
+
+	t.Run("email already confirmed", func(t *testing.T) {
+		email := "test@example.com"
+		code := "asdfKD"
+		_ = mockRepo.SaveEmailConfirmedCode(email, code)
+		_ = mockRepo.CongirmEmail(email)
+
+		err := userUseCase.EmailConfirmed(email, code)
+
+		assert.Error(t, err)
+		assert.Equal(t, user.ErrEmailAlreadyConfirmed, err)
+	})
+
+	t.Run("user not found", func(t *testing.T) {
+		email := "test@example.com"
+		code := "asdfKD"
+
+		err := userUseCase.EmailConfirmed(email, code)
+
+		assert.Error(t, err)
+		assert.Equal(t, user.ErrUserNotFound, err)
+	})
+
+	t.Run("invalid confirm code", func(t *testing.T) {
+		email := "test@example.com"
+		code := "asdfKD"
+
+		_ = mockRepo.SaveEmailConfirmedCode(email, code)
+
+		err := userUseCase.EmailConfirmed(email, "asdfasqewr")
+
+		assert.Error(t, err)
+		assert.Equal(t, user.ErrInvalidConfirmCode, err)
+	})
 }
 
 func TestUserUseCase_SendEmailForConfirmed(t *testing.T) {
+	mockRepo := NewMockUserData()
+	mockJWT := new(MockJWTService)
+	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
+	es := new(MockEmailSender)
+	userUseCase := services.NewUserUseCase(mockRepo, mockJWT, logger, es)
 
+	t.Run("success", func(t *testing.T) {
+		email := "test@example.com"
+
+		mockRepo.emailConfirmationStatus[email] = false
+
+		err := userUseCase.SendEmailForConfirmed(email)
+
+		code, err := mockRepo.GetEmailConfirmedCode(email)
+
+		assert.NoError(t, err)
+		assert.NotEmpty(t, code)
+	})
+
+	t.Run("email already confirmed", func(t *testing.T) {
+		email := "test@example.com"
+		code := "asdfKD"
+
+		_ = mockRepo.SaveEmailConfirmedCode(email, code)
+		_ = mockRepo.CongirmEmail(email)
+
+		err := userUseCase.SendEmailForConfirmed(email)
+
+		assert.Error(t, err)
+		assert.Equal(t, user.ErrEmailAlreadyConfirmed, err)
+	})
 }
 
 func TestUserUseCase_GenerateEmailCode(t *testing.T) {
+	code, err := services.GenerateEmailCode()
+	if err != nil {
+		t.Fatalf("GenerateEmailCode() returned an error: %v", err)
+	}
 
+	if len(code) != 6 {
+		t.Errorf("Expected code length to be 6, got %d", len(code))
+	}
+
+	const CharSet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+	for _, char := range code {
+		if !isCharInSet(char, CharSet) {
+			t.Errorf("Code contains invalid character: %v", char)
+		}
+	}
+
+	testRandomness(t, 1000)
+}
+
+func isCharInSet(char rune, set string) bool {
+	for _, s := range set {
+		if char == s {
+			return true
+		}
+	}
+	return false
+}
+
+func testRandomness(t *testing.T, iterations int) {
+	seen := make(map[string]bool)
+	for i := 0; i < iterations; i++ {
+		code, err := services.GenerateEmailCode()
+		if err != nil {
+			t.Fatalf("GenerateEmailCode() returned an error during randomness test: %v", err)
+		}
+		if seen[code] {
+			t.Errorf("Duplicate code generated: %s", code)
+		}
+		seen[code] = true
+	}
 }

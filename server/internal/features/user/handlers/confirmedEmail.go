@@ -41,10 +41,13 @@ func (uc *UserClient) EmailConfirmed(w http.ResponseWriter, r *http.Request) {
 		switch {
 		case errors.Is(err, u.ErrUserNotFound):
 			w.WriteHeader(http.StatusNotFound)
-			render.JSON(w, r, resp.Error("email confirmed not found"))
+			render.JSON(w, r, resp.Error(u.ErrUserNotFound.Error()))
 		case errors.Is(err, u.ErrEmailAlreadyConfirmed):
 			w.WriteHeader(http.StatusConflict)
-			render.JSON(w, r, resp.Error("email confirmed already exists"))
+			render.JSON(w, r, resp.Error(u.ErrEmailAlreadyConfirmed.Error()))
+		case errors.Is(err, u.ErrInvalidConfirmCode):
+			w.WriteHeader(http.StatusBadRequest)
+			render.JSON(w, r, resp.Error(u.ErrEmailNotConfirmed.Error()))
 		default:
 			log.Error("failed to confirm email", err)
 			w.WriteHeader(http.StatusInternalServerError)
