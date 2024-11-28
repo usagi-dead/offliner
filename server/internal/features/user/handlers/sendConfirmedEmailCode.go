@@ -11,7 +11,7 @@ import (
 // SendConfirmedEmailCode
 // @Summary Send code for confirmation email
 // @Tags Confirmations
-// @Description Generate code for confirmation email and send this to email
+// @Description Generate code for confirmation email and send this to email. This endpoint have rate 1 req in 1 min
 // @Accept json
 // @Produce json
 // @Param request body SendConfirmedEmailCodeRequest true "Email пользователя для подтверждения"

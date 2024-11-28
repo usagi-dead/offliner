@@ -78,7 +78,7 @@ const docTemplate = `{
         },
         "/auth/sign-up": {
             "post": {
-                "description": "Registers a new user with the provided email and password. On success, returns access and refresh tokens.",
+                "description": "Registers a new user with the provided email and password.",
                 "consumes": [
                     "application/json"
                 ],
@@ -285,7 +285,7 @@ const docTemplate = `{
         },
         "/confirm/send-email-code": {
             "post": {
-                "description": "Generate code for confirmation email and send this to email",
+                "description": "Generate code for confirmation email and send this to email. This endpoint have rate 1 req in 1 min",
                 "consumes": [
                     "application/json"
                 ],

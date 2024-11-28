@@ -30,7 +30,7 @@ type UserHandler interface {
 }
 
 type UserService interface {
-	SignUp(email string, password string) (string, string, error)
+	SignUp(email string, password string) error
 	SignIn(email string, password string) (string, string, error)
 	GetAuthURL(provider string) (string, error)
 	Callback(provider, state, code string) (bool, string, string, error)

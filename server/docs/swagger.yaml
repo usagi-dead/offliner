@@ -181,8 +181,7 @@ paths:
     post:
       consumes:
       - application/json
-      description: Registers a new user with the provided email and password. On success,
-        returns access and refresh tokens.
+      description: Registers a new user with the provided email and password.
       parameters:
       - description: User registration details
         in: body
@@ -246,7 +245,8 @@ paths:
     post:
       consumes:
       - application/json
-      description: Generate code for confirmation email and send this to email
+      description: Generate code for confirmation email and send this to email. This
+        endpoint have rate 1 req in 1 min
       parameters:
       - description: Email пользователя для подтверждения
         in: body

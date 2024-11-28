@@ -100,27 +100,17 @@ func TestUserUseCase_SignUp(t *testing.T) {
 		email := "test@example.com"
 		password := "securepassword"
 		userID := int64(1)
-		accessToken := "access-token"
-		refreshToken := "refresh-token"
 
 		// Настройка мока репозитория
 		mockRepo.On("CreateUser", email, mock.Anything).Return(userID, nil)
 
-		// Настройка мока JWT
-		mockJWT.On("GenerateAccessToken", userID, "user").Return(accessToken, nil)
-		mockJWT.On("GenerateRefreshToken", userID).Return(refreshToken, nil)
-
 		// Выполнение метода
-		act, ref, err := userUseCase.SignUp(email, password)
+		err := userUseCase.SignUp(email, password)
 
 		// Проверки
 		assert.NoError(t, err)
-		assert.Equal(t, accessToken, act)
-		assert.Equal(t, refreshToken, ref)
 
 		mockRepo.AssertCalled(t, "CreateUser", email, mock.Anything)
-		mockJWT.AssertCalled(t, "GenerateAccessToken", userID, "user")
-		mockJWT.AssertCalled(t, "GenerateRefreshToken", userID)
 	})
 }
 
@@ -217,6 +207,14 @@ func TestUserUseCase_SignIn(t *testing.T) {
 }
 
 func TestUserUseCase_oAuth(t *testing.T) {
+
+}
+
+func TestUserUseCase_EmailConfirmed(t *testing.T) {
+
+}
+
+func TestUserUseCase_SendEmailForConfirmed(t *testing.T) {
 
 }
 
