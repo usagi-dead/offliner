@@ -14,6 +14,7 @@ type Config struct {
 	CacheConfig      CacheConfig      `yaml:"cache"`
 	SMTPConfig       SMTPConfig       `yaml:"smtp"`
 	JWTConfig        JWTConfig        `yaml:"jwt"`
+	S3Config         S3Config         `yaml:"s3"`
 }
 
 type CacheConfig struct {
@@ -46,6 +47,12 @@ type JWTConfig struct {
 	SigningMethod string        `yaml:"signing_method" env-required:"true"`
 	AccessExpire  time.Duration `yaml:"access_expire" env-required:"true"`
 	RefreshExpire time.Duration `yaml:"refresh_expire" env-required:"true"`
+}
+
+type S3Config struct {
+	Endpoint string `yaml:"endpoint" env-required:"true"`
+	Bucket   string `yaml:"bucket" env-required:"true"`
+	Region   string `yaml:"region" env-required:"true"`
 }
 
 func MustLoad() *Config {

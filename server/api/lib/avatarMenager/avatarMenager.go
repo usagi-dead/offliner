@@ -1,10 +1,9 @@
-package avatarMenager
+package avatarManager
 
 import (
 	"bytes"
-	"fmt"
+	"errors"
 	"github.com/chai2010/webp"
-	"github.com/google/uuid"
 	"github.com/nfnt/resize"
 	"image"
 	"image/gif"
@@ -13,17 +12,13 @@ import (
 	"io"
 	"mime/multipart"
 	"net/http"
-	"os"
-	"path/filepath"
-	"server/api/lib/CustomErrors"
+	"sync"
 )
 
-const avatarDir = "./avatars"
-
-func SaveAvatar(file *multipart.File) (string, error) {
+func ParsingAvatarImage(file *multipart.File) ([]byte, []byte, error) {
 	buffer := new(bytes.Buffer)
 	if _, err := io.Copy(buffer, *file); err != nil {
-		return "", CustomErrors.ErrFileReadError
+		return nil, nil, errors.New("")
 	}
 
 	var img image.Image
@@ -38,19 +33,17 @@ func SaveAvatar(file *multipart.File) (string, error) {
 	case "image/gif":
 		isNonAnimated, err := isNonAnimatedGIF(bytes.NewReader(buffer.Bytes()))
 		if err != nil || !isNonAnimated {
-			return "", CustomErrors.ErrAnimatedGIFNotSupported
+			return nil, nil, errors.New("")
 		}
 		img, err = gif.Decode(buffer)
 	case "image/webp":
 		img, err = webp.Decode(buffer)
-	case "image/vnd.microsoft.icon":
-		return "", CustomErrors.ErrUnsupportedImageFormat
 	default:
-		return "", CustomErrors.ErrUnsupportedImageFormat
+		return nil, nil, errors.New("")
 	}
 
 	if err != nil {
-		return "", CustomErrors.ErrImageDecodingError
+		return nil, nil, errors.New("")
 	}
 
 	bounds := img.Bounds()
@@ -58,25 +51,51 @@ func SaveAvatar(file *multipart.File) (string, error) {
 	height := bounds.Dy()
 
 	if width != height {
-		return "", CustomErrors.ErrImageMustBeSquare
+		return nil, nil, errors.New("")
 	}
 
-	resizedImg := resize.Resize(512, 512, img, resize.Lanczos3)
+	var wg sync.WaitGroup
+	var buf512, buf52 []byte
+	var err512, err52 error
 
-	uniqueFileName := fmt.Sprintf("%s.webp", uuid.New().String())
-	fileName := filepath.Join(avatarDir, uniqueFileName)
+	// Обработка 512x512
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		resized := resize.Resize(512, 512, img, resize.Lanczos3)
+		buffer := new(bytes.Buffer)
+		if err := webp.Encode(buffer, resized, &webp.Options{Quality: 80}); err != nil {
+			err512 = errors.New("")
+			return
+		}
+		buf512 = buffer.Bytes()
+	}()
 
-	out, err := os.Create(fileName)
-	if err != nil {
-		return "", CustomErrors.ErrFileSaveError
+	// Обработка 52x52
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		resized := resize.Resize(52, 52, img, resize.Lanczos3)
+		buffer := new(bytes.Buffer)
+		if err := webp.Encode(buffer, resized, &webp.Options{Quality: 80}); err != nil {
+			err52 = errors.New("")
+			return
+		}
+		buf52 = buffer.Bytes()
+	}()
+
+	// Ожидание завершения всех горутин
+	wg.Wait()
+
+	// Проверка на ошибки
+	if err512 != nil {
+		return nil, nil, err512
 	}
-	defer out.Close()
-
-	if err := webp.Encode(out, resizedImg, &webp.Options{Quality: 80}); err != nil {
-		return "", CustomErrors.ErrWebPEncodingError
+	if err52 != nil {
+		return nil, nil, err52
 	}
 
-	return "http://localhost:8080/user/avatar?filename=" + uniqueFileName, nil
+	return buf512, buf52, nil
 }
 
 func isNonAnimatedGIF(reader io.Reader) (bool, error) {

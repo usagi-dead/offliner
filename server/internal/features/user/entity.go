@@ -46,9 +46,10 @@ type UserData interface {
 	GetUserByEmail(Email string) (*User, error)
 	SaveStateCode(state string) error
 	VerifyStateCode(state string) (bool, error)
-	CongirmEmail(email string) error
+	ConfirmEmail(email string) error
 	IsEmailConfirmed(email string) (bool, error)
 	SaveEmailConfirmedCode(email string, code string) error
 	GetEmailConfirmedCode(email string) (string, error)
 	GetUserById(userId int64) (*User, error)
+	UploadAvatar(avatarSmall []byte, avatarLarge []byte, userId string) (string, error)
 }

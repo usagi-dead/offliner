@@ -70,7 +70,7 @@ func (uus *UserUseCase) Callback(provider, state, code string) (bool, string, st
 
 	isValidState, err := uus.repo.VerifyStateCode(state)
 	if err != nil || !isValidState {
-		return false, "", "", u.ErrInvalidState
+		return false, "", "", err
 	}
 
 	token, err := config.Exchange(context.Background(), code)
