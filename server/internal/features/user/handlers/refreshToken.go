@@ -1,79 +1,51 @@
 package handlers
 
-//
-//import (
-//	"github.com/go-chi/chi/v5/middleware"
-//	"github.com/go-chi/render"
-//	"log/slog"
-//	"net/http"
-//	"server/api/lib/jwt"
-//	resp "server/api/lib/response"
-//	"server/internal/features/user/data"
-//)
-//
-//type refreshAccessTokenResponse struct {
-//	AccessToken string `json:"access_token"`
-//}
-//
-//type GetUser interface {
-//	GetUserById(UserId int64) (*data.User, error)
-//}
-//
-//type UnauthorizedResponse struct {
-//	Status string `json:"status" example:"error"`
-//	Error  string `json:"error" example:"unauthorized"`
-//}
-//
-//// RefreshTokenHandler godoc
-//// @Summary Refresh Access Token
-//// @Tags auth
-//// @Description Refreshes the access token using the provided refresh token from cookies.
-//// @Accept json
-//// @Produce json
-//// @Success 200 {object} SingInResponse "Successfully refreshed access token"
-//// @Failure 401 {object} UnauthorizedResponse "Invalid or missing refresh token"
-//// @Failure 500 {object} InternalServerErrorResponse "Internal server error"
-//// @Router /auth/refresh-token [post]
-//func RefreshTokenHandler(getUser GetUser, log *slog.Logger) func(w http.ResponseWriter, r *http.Request) {
-//	return func(w http.ResponseWriter, r *http.Request) {
-//		const op string = "RefreshTokenHandler"
-//
-//		log = log.With(
-//			slog.String("op", op),
-//			slog.String("request_id", middleware.GetReqID(r.Context())),
-//		)
-//
-//		refreshToken, err := r.Cookie("refresh_token")
-//		if err != nil {
-//			log.Error("failed extract access token: %v", r)
-//			http.Error(w, "token missed", http.StatusUnauthorized)
-//			return
-//		}
-//
-//		claims, err := jwt.ValidateJWT(refreshToken.Value)
-//		if err != nil {
-//			log.Error("invalid token: %v", err.Error())
-//			http.Error(w, "invalid token", http.StatusUnauthorized)
-//			return
-//		}
-//
-//		user, err := getUser.GetUserById(claims.UserId)
-//		if err != nil {
-//			log.Info("dont find user by id: %v", err.Error())
-//			http.Error(w, "invalid token", http.StatusUnauthorized)
-//			return
-//		}
-//
-//		accessToken, err := jwt.GenerateAccessToken(user.UserId, user.Role)
-//		if err != nil {
-//			log.Error("failed to generate access token", err)
-//			w.WriteHeader(http.StatusInternalServerError)
-//			render.JSON(w, r, resp.Error("failed to generate access token"))
-//			return
-//		}
-//
-//		w.Header().Set("Content-Type", "application/json")
-//		w.WriteHeader(http.StatusOK)
-//		render.JSON(w, r, resp.AccessToken(accessToken))
-//	}
-//}
+import (
+	"errors"
+	"github.com/go-chi/render"
+	"log/slog"
+	"net/http"
+	resp "server/api/lib/response"
+	u "server/internal/features/user"
+)
+
+// RefreshToken
+// @Summary Refresh Access Token
+// @Tags Authentication
+// @Description Refreshes the access token using the provided refresh token from cookies.
+// @Accept json
+// @Produce json
+// @Success 200 {object} response.Response "Successfully refreshed access token"
+// @Failure 401 {object} response.Response "Invalid, missing or expired refresh token"
+// @Failure 500 {object} response.Response "Internal server error"
+// @Router /auth/refresh-token [post]
+func (uc *UserClient) RefreshToken(w http.ResponseWriter, r *http.Request) {
+	log := uc.log.With(slog.String("op", "RefreshTokenHandler"))
+
+	AccessToken, err := uc.us.RefreshToken(r)
+	if err != nil {
+		switch {
+		case errors.Is(err, u.ErrNoRefreshToken):
+			w.WriteHeader(http.StatusUnauthorized)
+			render.JSON(w, r, resp.Error(err.Error()))
+		case errors.Is(err, u.ErrInvalidToken):
+			w.WriteHeader(http.StatusUnauthorized)
+			render.JSON(w, r, resp.Error(err.Error()))
+		case errors.Is(err, u.ErrExpiredToken):
+			w.WriteHeader(http.StatusUnauthorized)
+			render.JSON(w, r, resp.Error(err.Error()))
+		case errors.Is(err, u.ErrUserNotFound):
+			w.WriteHeader(http.StatusUnauthorized)
+			render.JSON(w, r, resp.Error(err.Error()))
+		default:
+			log.Error(err.Error())
+			w.WriteHeader(http.StatusInternalServerError)
+			render.JSON(w, r, resp.Error(u.ErrInternal.Error()))
+		}
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	render.JSON(w, r, resp.AccessToken(AccessToken))
+}

@@ -20,6 +20,41 @@ definitions:
     required:
     - email
     type: object
+  handlers.UpdateUserRequest:
+    properties:
+      date_of_birth:
+        example: "1985-04-12T00:00:00Z"
+        type: string
+      gender:
+        enum:
+        - male
+        - female
+        example: male
+        type: string
+      name:
+        example: Doe
+        maxLength: 50
+        minLength: 1
+        type: string
+      patronymic:
+        example: Smith
+        maxLength: 50
+        minLength: 1
+        type: string
+      phone_number:
+        example: "+1234567890"
+        type: string
+      reset_avatar:
+        example: false
+        type: boolean
+      surname:
+        example: John
+        maxLength: 50
+        minLength: 1
+        type: string
+    required:
+    - reset_avatar
+    type: object
   handlers.UserSignUpRequest:
     properties:
       email:
@@ -137,6 +172,50 @@ paths:
           schema:
             $ref: '#/definitions/response.Response'
       summary: OAuth2 Callback Handler
+      tags:
+      - Authentication
+  /auth/logout:
+    post:
+      consumes:
+      - application/json
+      description: Logs out the user by clearing the refresh token cookie. If the
+        cookie is not found, returns success without any action.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User successfully logged out or no refresh token found
+          schema:
+            $ref: '#/definitions/response.Response'
+        "204":
+          description: No content, token was successfully invalidated
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Logout user
+      tags:
+      - Authentication
+  /auth/refresh-token:
+    post:
+      consumes:
+      - application/json
+      description: Refreshes the access token using the provided refresh token from
+        cookies.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully refreshed access token
+          schema:
+            $ref: '#/definitions/response.Response'
+        "401":
+          description: Invalid, missing or expired refresh token
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Refresh Access Token
       tags:
       - Authentication
   /auth/sign-in:
@@ -272,4 +351,107 @@ paths:
       summary: Send code for confirmation email
       tags:
       - Confirmations
+  /user/delete:
+    delete:
+      consumes:
+      - application/json
+      description: Deletes the currently authenticated user based on the user ID retrieved
+        from the request context.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User successfully deleted
+          schema:
+            $ref: '#/definitions/response.Response'
+        "401":
+          description: Unauthorized or invalid user ID
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BearerAuth: []
+      summary: Delete user
+      tags:
+      - Profile
+  /user/edit:
+    put:
+      consumes:
+      - multipart/form-data
+      description: Updates user profile details including name, surname, patronymic,
+        date of birth, phone number, gender, and avatar.
+      parameters:
+      - description: User profile data
+        in: body
+        name: json
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.UpdateUserRequest'
+      - description: Avatar image file (optional)
+        in: formData
+        name: avatar
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User profile updated successfully
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Invalid request or validation error
+          schema:
+            $ref: '#/definitions/response.Response'
+        "401":
+          description: Unauthorized user
+          schema:
+            $ref: '#/definitions/response.Response'
+        "404":
+          description: User not found
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Update User Profile
+      tags:
+      - Profile
+  /user/me:
+    get:
+      description: Retrieves the profile details of the authenticated user.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User profile retrieved successfully
+          schema:
+            $ref: '#/definitions/response.Response'
+        "401":
+          description: Unauthorized user
+          schema:
+            $ref: '#/definitions/response.Response'
+        "404":
+          description: User not found
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Get User Profile
+      tags:
+      - Profile
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"

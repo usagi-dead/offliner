@@ -26,7 +26,7 @@ func (uuc *UserUseCase) EmailConfirmed(email string, code string) error {
 		return u.ErrInvalidConfirmCode
 	}
 
-	if err := uuc.repo.CongirmEmail(email); err != nil {
+	if err := uuc.repo.ConfirmEmail(email); err != nil {
 		return err
 	}
 

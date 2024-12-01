@@ -14,7 +14,7 @@ type Cache struct {
 	EmailConfirmedCodeExpiration time.Duration
 }
 
-func New(cfg config.CacheConfig) (*Cache, error) {
+func NewCache(cfg config.CacheConfig) (*Cache, error) {
 	client := redis.NewClient(&redis.Options{
 		Addr:     cfg.Address,
 		DB:       cfg.Db,

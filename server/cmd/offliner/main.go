@@ -7,6 +7,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	jwt2 "server/api/lib/jwt"
+	"server/internal/s3Storage"
 
 	"github.com/go-chi/httprate"
 	swag "github.com/swaggo/http-swagger/v2"
@@ -15,7 +16,7 @@ import (
 	"os"
 	"os/signal"
 	"server/api/lib/emailsender"
-	// middleJWT "server/api/middleware/jwt"
+	middleJWT "server/api/middleware/jwt"
 	middlelog "server/api/middleware/logger"
 	_ "server/docs"
 	"server/internal/cache"
@@ -31,6 +32,7 @@ import (
 type App struct {
 	Storage     *storage.Storage
 	Cache       *cache.Cache
+	S3          *s3Storage.S3Storage
 	EmailSender *emailsender.EmailSender
 	Router      chi.Router
 	Log         *slog.Logger
@@ -48,9 +50,14 @@ func NewApp(cfg *config.Config, log *slog.Logger) (*App, error) {
 		return nil, fmt.Errorf("apply migrations failed: %w", err)
 	}
 
-	Cache, err := cache.New(cfg.CacheConfig)
+	Cache, err := cache.NewCache(cfg.CacheConfig)
 	if err != nil {
 		return nil, fmt.Errorf("cache init failed: %w", err)
+	}
+
+	s3, err := s3Storage.NewS3Storage(cfg.S3Config)
+	if err != nil {
+		return nil, fmt.Errorf("s3 init failed: %w", err)
 	}
 
 	eSender, err := emailsender.New(cfg.SMTPConfig)
@@ -59,7 +66,7 @@ func NewApp(cfg *config.Config, log *slog.Logger) (*App, error) {
 	}
 
 	router := chi.NewRouter()
-	return &App{Storage: Storage, Cache: Cache, EmailSender: eSender, Router: router, Log: log, Cfg: cfg}, nil
+	return &App{Storage: Storage, Cache: Cache, S3: s3, EmailSender: eSender, Router: router, Log: log, Cfg: cfg}, nil
 }
 
 func (app *App) Start() error {
@@ -105,7 +112,7 @@ func (app *App) SetupRoutes() {
 		middleware.URLFormat,
 	)
 
-	// var jwtMiddleware = middleJWT.New(app.Log)
+	var jwtMiddleware = middleJWT.New(app.Log, jwt2.NewJWTHandler(&app.Cfg.JWTConfig))
 
 	//Swagger UI endpoint
 	app.Router.Get("/swagger/*", swag.Handler(
@@ -115,15 +122,20 @@ func (app *App) SetupRoutes() {
 	apiVersion := "/v1"
 
 	// Группа для аунтификации
-	UserData := data.NewUserQuery(app.Log, app.Storage.Db, app.Cache)
-	UserService := services.NewUserUseCase(UserData, jwt2.NewJWTHandler(), app.Log, app.EmailSender)
+	UserDB := data.NewUserDB(app.Storage.Db)
+	UserCache := data.NewUserCache(app.Cache)
+	UserS3 := data.NewUserS3(app.S3)
+	UserData := data.NewUserQuery(UserDB, UserCache, UserS3)
+	UserService := services.NewUserUseCase(UserData, jwt2.NewJWTHandler(&app.Cfg.JWTConfig), app.Log, app.EmailSender)
 	UserHandler := handlers.NewUserClient(app.Log, UserService)
 
 	app.Router.Route(apiVersion+"/auth", func(r chi.Router) {
 		r.Post("/sign-up", UserHandler.SignUp)
 		r.Post("/sign-in", UserHandler.SignIn)
+		r.Post("/refresh-token", UserHandler.RefreshToken)
 		r.Get("/{provider}", UserHandler.Oauth)
 		r.Get("/{provider}/callback", UserHandler.OauthCallback)
+		r.Post("/logout", UserHandler.LogoutHandler)
 	})
 
 	app.Router.Route(apiVersion+"/confirm", func(r chi.Router) {
@@ -134,23 +146,23 @@ func (app *App) SetupRoutes() {
 		r.Put("/email", UserHandler.EmailConfirmed)
 	})
 
-	//// Группа для пользовательских маршрутов (требует авторизации)
-	//app.Router.Route("/user", func(r chi.Router) {
-	//	r.Use(jwtMiddleware)
-	//	r.Get("/avatar", handlers.AvatarHandler(app.Log))
-	//	//r.Put("/complete-profile", profile.CompleteProfileHandler(app.Storage, app.Log))
-	//	//r.Get("/me", profile.ProfileHandler(app.Storage, app.Log))
-	//})
+	// Группа для пользовательских маршрутов (требует авторизации)
+	app.Router.Route(apiVersion+"/user", func(r chi.Router) {
+		r.Use(jwtMiddleware)
+		r.Put("/edit", UserHandler.UpdateUserHandler)
+		r.Get("/me", UserHandler.GetUserHandler)
+		r.Delete("/delete", UserHandler.DeleteUserHandler)
+	})
 
 	//// Группа для административных маршрутов
 	//app.Router.Route("/admin", func(r chi.Router) {
-	//	r.Use(middleJWT.New(app.Log))
+	//	r.Use(middleJWT.NewCache(app.Log))
 	//	//r.Use(middleAdmin)
 	//})
 	//
 	////Группа маршутов для супперадминов для создание админов
 	//app.Router.Group(func(r chi.Router) {
-	//	r.Use(middleJWT.New(app.Log))
+	//	r.Use(middleJWT.NewCache(app.Log))
 	//	//r.Use(WhiteIpList(WhiteList)
 	//	//r.Use(middleSuperAdmin)
 	//	//r.Post("/admin/create", auth.CrateAdminHandler(app.Storage, app.Log))
@@ -163,6 +175,9 @@ func (app *App) SetupRoutes() {
 // @contact.name Evdokimov Igor
 // @contact.url https://t.me/epelptic
 // @BasePath /v1
+// @securityDefinitions.apikey ApiKeyAuth
+// @in header
+// @name Authorization
 func main() {
 	cfg := config.MustLoad()
 	log := SetupLogger(cfg.Env)

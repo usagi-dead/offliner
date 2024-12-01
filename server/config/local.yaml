@@ -17,3 +17,11 @@ smtp:
     host: "smtp.yandex.ru"
     port: 465
     username: "OfflinerMen@yandex.by"
+jwt:
+    signing_method: "HS256"
+    access_expire: 7m
+    refresh_expire: 360h
+s3:
+    endpoint: "storage-173.s3hoster.by"
+    bucket: "useravatars"
+    region: "BTC"

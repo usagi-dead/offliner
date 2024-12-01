@@ -4,7 +4,9 @@ import (
 	"errors"
 	"fmt"
 	"github.com/go-playground/validator/v10"
+	u "server/internal/features/user"
 	"strings"
+	"time"
 )
 
 // Response represents the general structure of an API response
@@ -22,6 +24,33 @@ const (
 
 type AccessTokenData struct {
 	AccessToken string `json:"access_token"`
+}
+
+type UserProfileData struct {
+	Email       string     `json:"email"`
+	Surname     *string    `json:"surname,omitempty"`
+	Name        *string    `json:"username,omitempty"`
+	Patronymic  *string    `json:"patronymic,omitempty"`
+	DateOfBirth *time.Time `json:"date_of_birth,omitempty"`
+	PhoneNumber *string    `json:"phone_number,omitempty"`
+	AvatarUrl   *string    `json:"avatar_url"`
+	Gender      *string    `json:"gender,omitempty"`
+}
+
+func UserProfile(user *u.User) Response {
+	return Response{
+		Status: StatusOK,
+		Data: UserProfileData{
+			Email:       user.Email,
+			Surname:     user.Surname,
+			Name:        user.Name,
+			Patronymic:  user.Patronymic,
+			DateOfBirth: user.DateOfBirth,
+			PhoneNumber: user.PhoneNumber,
+			AvatarUrl:   user.AvatarUrl,
+			Gender:      user.Gender,
+		},
+	}
 }
 
 func AccessToken(token string) Response {
