@@ -5,23 +5,23 @@ import (
 	u "server/internal/features/user"
 )
 
-func (uus *UserUseCase) RefreshToken(r *http.Request) (string, error) {
+func (uuc *UserUseCase) RefreshToken(r *http.Request) (string, error) {
 	refreshToken, err := r.Cookie("refresh_token")
 	if err != nil {
 		return "", u.ErrNoRefreshToken
 	}
 
-	claims, err := uus.jwt.ValidateJWT(refreshToken.Value)
+	claims, err := uuc.jwt.ValidateJWT(refreshToken.Value)
 	if err != nil {
 		return "", err
 	}
 
-	user, err := uus.repo.GetUserById(claims.UserId)
+	user, err := uuc.repo.GetUserById(claims.UserId)
 	if err != nil {
 		return "", err
 	}
 
-	accessToken, err := uus.jwt.GenerateAccessToken(claims.UserId, user.Role)
+	accessToken, err := uuc.jwt.GenerateAccessToken(claims.UserId, user.Role)
 	if err != nil {
 		return "", err
 	}

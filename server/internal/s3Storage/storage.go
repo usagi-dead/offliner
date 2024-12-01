@@ -10,7 +10,9 @@ import (
 	"github.com/aws/aws-sdk-go-v2/credentials"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"log"
+	"mime/multipart"
 	"os"
+	avatarManager "server/api/lib/avatarMenager"
 	"server/internal/config"
 	"time"
 )
@@ -26,7 +28,7 @@ func NewS3Storage(config config.S3Config) (*S3Storage, error) {
 	secretKey := os.Getenv("S3_SECRET_KEY")
 
 	if accessKey == "" || secretKey == "" {
-		return nil, errors.New("S3 env not set")
+		return nil, errors.New("s3 env not set")
 	}
 
 	customResolver := aws.EndpointResolverFunc(func(service, region string) (aws.Endpoint, error) {
@@ -134,24 +136,36 @@ func applyBucketPolicy(client *s3.Client, bucket string) error {
 }
 
 func uploadDefaultAvatar(client *s3.Client, bucket string) error {
-	defaultAvatar, err := os.ReadFile("default.webp")
+	file, err := os.Open("./server/default.webp")
 	if err != nil {
-		return fmt.Errorf("unable to read default avatar file: %v", err)
+		return fmt.Errorf("unable to open default avatar file: %v", err)
 	}
+	defer file.Close()
+	var multipartFile multipart.File = file
 
-	objectKey := "avatars/default.webp"
-	uploadInput := &s3.PutObjectInput{
-		Bucket:      &bucket,
-		Key:         &objectKey,
-		Body:        bytes.NewReader(defaultAvatar),
-		ContentType: aws.String("image/webp"),
-	}
-
-	_, err = client.PutObject(context.TODO(), uploadInput)
+	buf512, buf52, err := avatarManager.ParsingAvatarImage(&multipartFile)
 	if err != nil {
-		return fmt.Errorf("unable to upload default avatar to S3: %v", err)
+		return fmt.Errorf("failed to process default avatar image: %v", err)
 	}
 
-	log.Println("Default avatar uploaded successfully.")
+	keys := map[string][]byte{
+		"default/512x512.webp": buf512,
+		"default/52x52.webp":   buf52,
+	}
+
+	for key, data := range keys {
+		uploadInput := &s3.PutObjectInput{
+			Bucket:      &bucket,
+			Key:         aws.String(key),
+			Body:        bytes.NewReader(data),
+			ContentType: aws.String("image/webp"),
+		}
+
+		_, err := client.PutObject(context.TODO(), uploadInput)
+		if err != nil {
+			return fmt.Errorf("failed to upload %s to S3: %v", key, err)
+		}
+	}
+
 	return nil
 }

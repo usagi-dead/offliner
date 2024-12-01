@@ -23,5 +23,5 @@ jwt:
     refresh_expire: 360h
 s3:
     endpoint: "storage-173.s3hoster.by"
-    basket: "useravatars"
+    bucket: "useravatars"
     region: "BTC"

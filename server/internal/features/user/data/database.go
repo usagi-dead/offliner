@@ -14,9 +14,9 @@ type UserDBClient interface {
 	GetUserByEmail(email string) (*u.User, error)
 	GetUserById(userId int64) (*u.User, error)
 	IsEmailConfirmed(email string) (bool, error)
-	UpdateUser(email string) error
+	UpdateUser(user *u.User) error
 	ConfirmEmail(email string) error
-	DeleteUser(email string) error
+	DeleteUser(userId int64) error
 }
 
 type UserDB struct {
@@ -163,9 +163,23 @@ func (db *UserDB) IsEmailConfirmed(email string) (bool, error) {
 	return verified, nil
 }
 
-func (db *UserDB) UpdateUser(email string) error {
-	//TODO: implement me
-	return nil
+func (db *UserDB) UpdateUser(user *u.User) error {
+	_, err := db.db.Exec(context.Background(),
+		`UPDATE users
+		 SET 
+		     name = COALESCE($1, name),
+		     surname = COALESCE($2, surname),
+		     patronymic = COALESCE($3, patronymic),
+		     date_of_birth = COALESCE($4, date_of_birth),
+		     phone_number = COALESCE($5, phone_number),
+		     gender = COALESCE($6, gender),
+		     avatar_url = COALESCE($7, avatar_url)
+		 WHERE user_id = $8`,
+		user.Name, user.Surname, user.Patronymic, user.DateOfBirth,
+		user.PhoneNumber, user.Gender, user.AvatarUrl, user.UserId,
+	)
+
+	return err
 }
 
 func (db *UserDB) ConfirmEmail(email string) error {
@@ -184,7 +198,18 @@ func (db *UserDB) ConfirmEmail(email string) error {
 	return nil
 }
 
-func (db *UserDB) DeleteUser(email string) error {
-	//TODO: implement me
+func (db *UserDB) DeleteUser(userId int64) error {
+	_, err := db.db.Exec(context.Background(),
+		`DELETE FROM users WHERE user_id = $1`,
+		userId,
+	)
+
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return u.ErrUserNotFound
+		}
+		return err
+	}
+
 	return nil
 }

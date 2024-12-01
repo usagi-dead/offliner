@@ -42,6 +42,10 @@ func (uq *UserQuery) VerifyStateCode(state string) (bool, error) {
 	return uq.ch.VerifyStateCode(state)
 }
 
+func (uq *UserQuery) UpdateUser(user *u.User) error {
+	return uq.db.UpdateUser(user)
+}
+
 func (uq *UserQuery) ConfirmEmail(email string) error {
 	return uq.db.ConfirmEmail(email)
 }
@@ -58,6 +62,14 @@ func (uq *UserQuery) GetEmailConfirmedCode(email string) (string, error) {
 	return uq.ch.GetEmailConfirmedCode(email)
 }
 
-func (uq *UserQuery) UploadAvatar(avatarSmall []byte, avatarLarge []byte, userId string) (string, error) {
+func (uq *UserQuery) UploadAvatar(avatarSmall []byte, avatarLarge []byte, userId int64) (*string, error) {
 	return uq.s3.UploadAvatar(avatarSmall, avatarLarge, userId)
+}
+
+func (uq *UserQuery) DeleteUser(userId int64) error {
+	return uq.db.DeleteUser(userId)
+}
+
+func (uq *UserQuery) DeleteAvatar(userId int64) error {
+	return uq.s3.DeleteAvatar(userId)
 }

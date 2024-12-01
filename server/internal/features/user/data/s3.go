@@ -6,16 +6,15 @@ import (
 	"fmt"
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
-	"log"
+	"github.com/aws/aws-sdk-go-v2/service/s3/types"
 	"server/internal/features/user"
 	"server/internal/s3Storage"
 	"sync"
 )
 
 type UserS3Client interface {
-	UploadAvatar(avatarSmall []byte, avatarLarge []byte, userId string) (string, error)
-	DownloadAvatar(userId string) (string, error)
-	DeleteAvatar(userId string) error
+	UploadAvatar(avatarSmall []byte, avatarLarge []byte, userId int64) (*string, error)
+	DeleteAvatar(userId int64) error
 }
 
 type UserS3 struct {
@@ -28,8 +27,8 @@ func NewUserS3(storage *s3Storage.S3Storage) *UserS3 {
 	}
 }
 
-func (u *UserS3) UploadAvatar(avatarSmall []byte, avatarLarge []byte, userId string) (string, error) {
-	folderPath := fmt.Sprintf("avatars/%s/", userId)
+func (u *UserS3) UploadAvatar(avatarSmall []byte, avatarLarge []byte, userId int64) (*string, error) {
+	folderPath := fmt.Sprintf("avatars/%d/", userId)
 
 	objectKeySmall := folderPath + "52x52.webp"
 	objectKeyLarge := folderPath + "512x512.webp"
@@ -49,10 +48,7 @@ func (u *UserS3) UploadAvatar(avatarSmall []byte, avatarLarge []byte, userId str
 		}
 
 		_, errSmall = u.storage.Client.PutObject(context.TODO(), uploadInputSmall)
-		if errSmall != nil {
-			log.Printf("unable to upload small avatar to S3, %v", errSmall)
-			return
-		}
+		return
 	}()
 
 	wg.Add(1)
@@ -67,28 +63,37 @@ func (u *UserS3) UploadAvatar(avatarSmall []byte, avatarLarge []byte, userId str
 		}
 
 		_, errLarge = u.storage.Client.PutObject(context.TODO(), uploadInputLarge)
-		if errLarge != nil {
-			log.Printf("unable to upload large avatar to S3, %v", errLarge)
-			return
-		}
+		return
 	}()
 
 	wg.Wait()
 
 	if errSmall != nil || errLarge != nil {
-		return "", user.ErrInternal
+		return nil, user.ErrInternal
 	}
 
 	folderURL := fmt.Sprintf("https://%s.%s/%s", u.storage.Bucket, u.storage.Endpoint, folderPath)
-	return folderURL, nil
+	return &folderURL, nil
 }
 
-func (u *UserS3) DownloadAvatar(userId string) (string, error) {
-	//TODO: implement me
-	return "", nil
-}
+func (u *UserS3) DeleteAvatar(userId int64) error {
+	folderPath := fmt.Sprintf("avatars/%d/", userId)
 
-func (u *UserS3) DeleteAvatar(userId string) error {
-	//TODO: implement me
-	return nil
+	objectsToDelete := []string{folderPath + "52x52.webp", folderPath + "512x512.webp"}
+
+	var objectsId []types.ObjectIdentifier
+	objectsId = append(objectsId, types.ObjectIdentifier{Key: aws.String(objectsToDelete[0])})
+	objectsId = append(objectsId, types.ObjectIdentifier{Key: aws.String(objectsToDelete[1])})
+
+	deleteInput := &s3.DeleteObjectsInput{
+		Bucket: &u.storage.Bucket,
+		Delete: &types.Delete{
+			Objects: objectsId,
+			Quiet:   aws.Bool(false),
+		},
+	}
+
+	_, err := u.storage.Client.DeleteObjects(context.Background(), deleteInput)
+
+	return err
 }

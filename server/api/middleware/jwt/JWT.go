@@ -20,7 +20,7 @@ func New(log *slog.Logger, jwt j.JWTService) func(next http.Handler) http.Handle
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			tokenString, err := jwt.ExtractJWTFromHeader(r)
 			if err != nil {
-				log.Error("failed extract access token: %v", err.Error())
+				log.Error("failed extract access token: %s", err.Error())
 				http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 				return
 			}

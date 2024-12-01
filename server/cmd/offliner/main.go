@@ -16,7 +16,7 @@ import (
 	"os"
 	"os/signal"
 	"server/api/lib/emailsender"
-	// middleJWT "server/api/middleware/jwt"
+	middleJWT "server/api/middleware/jwt"
 	middlelog "server/api/middleware/logger"
 	_ "server/docs"
 	"server/internal/cache"
@@ -112,7 +112,7 @@ func (app *App) SetupRoutes() {
 		middleware.URLFormat,
 	)
 
-	// var jwtMiddleware = middleJWT.NewCache(app.Log)
+	var jwtMiddleware = middleJWT.New(app.Log, jwt2.NewJWTHandler(&app.Cfg.JWTConfig))
 
 	//Swagger UI endpoint
 	app.Router.Get("/swagger/*", swag.Handler(
@@ -135,6 +135,7 @@ func (app *App) SetupRoutes() {
 		r.Post("/refresh-token", UserHandler.RefreshToken)
 		r.Get("/{provider}", UserHandler.Oauth)
 		r.Get("/{provider}/callback", UserHandler.OauthCallback)
+		r.Post("/logout", UserHandler.LogoutHandler)
 	})
 
 	app.Router.Route(apiVersion+"/confirm", func(r chi.Router) {
@@ -146,11 +147,11 @@ func (app *App) SetupRoutes() {
 	})
 
 	// Группа для пользовательских маршрутов (требует авторизации)
-	app.Router.Route("/user", func(r chi.Router) {
-		//r.Use(jwtMiddleware)
-		//r.Get("/avatar", handlers.AvatarHandler(app.Log))
-		//r.Put("/complete-profile", profile.CompleteProfileHandler(app.Storage, app.Log))
-		//r.Get("/profile", profile.ProfileHandler(app.Storage, app.Log))
+	app.Router.Route(apiVersion+"/user", func(r chi.Router) {
+		r.Use(jwtMiddleware)
+		r.Put("/edit", UserHandler.UpdateUserHandler)
+		r.Get("/me", UserHandler.GetUserHandler)
+		r.Delete("/delete", UserHandler.DeleteUserHandler)
 	})
 
 	//// Группа для административных маршрутов
@@ -174,7 +175,7 @@ func (app *App) SetupRoutes() {
 // @contact.name Evdokimov Igor
 // @contact.url https://t.me/epelptic
 // @BasePath /v1
-// @securityDefinitions.apikey BearerAuth
+// @securityDefinitions.apikey ApiKeyAuth
 // @in header
 // @name Authorization
 func main() {
