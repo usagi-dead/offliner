@@ -408,7 +408,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Profile"
+                    "User"
                 ],
                 "summary": "Delete user",
                 "responses": {
@@ -448,18 +448,16 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Profile"
+                    "User"
                 ],
                 "summary": "Update User Profile",
                 "parameters": [
                     {
-                        "description": "User profile data",
+                        "type": "string",
+                        "description": "User profile data (JSON string)",
                         "name": "json",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/handlers.UpdateUserRequest"
-                        }
+                        "in": "formData",
+                        "required": true
                     },
                     {
                         "type": "file",
@@ -514,7 +512,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Profile"
+                    "User"
                 ],
                 "summary": "Get User Profile",
                 "responses": {
@@ -573,52 +571,6 @@ const docTemplate = `{
                 "email": {
                     "type": "string",
                     "example": "jon.doe@gmail.com"
-                }
-            }
-        },
-        "handlers.UpdateUserRequest": {
-            "type": "object",
-            "required": [
-                "reset_avatar"
-            ],
-            "properties": {
-                "date_of_birth": {
-                    "type": "string",
-                    "example": "1985-04-12T00:00:00Z"
-                },
-                "gender": {
-                    "type": "string",
-                    "enum": [
-                        "male",
-                        "female"
-                    ],
-                    "example": "male"
-                },
-                "name": {
-                    "type": "string",
-                    "maxLength": 50,
-                    "minLength": 1,
-                    "example": "Doe"
-                },
-                "patronymic": {
-                    "type": "string",
-                    "maxLength": 50,
-                    "minLength": 1,
-                    "example": "Smith"
-                },
-                "phone_number": {
-                    "type": "string",
-                    "example": "+1234567890"
-                },
-                "reset_avatar": {
-                    "type": "boolean",
-                    "example": false
-                },
-                "surname": {
-                    "type": "string",
-                    "maxLength": 50,
-                    "minLength": 1,
-                    "example": "John"
                 }
             }
         },

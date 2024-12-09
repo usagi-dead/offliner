@@ -15,10 +15,10 @@ import (
 // @Security ApiKeyAuth
 // @Summary Update User Profile
 // @Description Updates user profile details including name, surname, patronymic, date of birth, phone number, gender, and avatar.
-// @Tags Profile
+// @Tags User
 // @Accept multipart/form-data
 // @Produce json
-// @Param json body handlers.UpdateUserRequest true "User profile data"
+// @Param json formData string true "User profile data (JSON string)"
 // @Param avatar formData file false "Avatar image file (optional)"
 // @Success 200 {object} response.Response "User profile updated successfully"
 // @Failure 400 {object} response.Response "Invalid request or validation error"

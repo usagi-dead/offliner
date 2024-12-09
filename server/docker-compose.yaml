@@ -15,6 +15,8 @@ services:
       YANDEX_EMAIL_PASSWORD: ${YANDEX_EMAIL_PASSWORD}
       YANDEX_KEY: ${YANDEX_KEY}
       YANDEX_SECRET: ${YANDEX_SECRET}
+      S3_ACCESS_KEY: ${S3_ACCESS_KEY}
+      S3_SECRET_KEY: ${S3_SECRET_KEY}
     volumes:
       - avatars:/app/avatars
       - ./config:/config

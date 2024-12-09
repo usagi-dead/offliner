@@ -20,41 +20,6 @@ definitions:
     required:
     - email
     type: object
-  handlers.UpdateUserRequest:
-    properties:
-      date_of_birth:
-        example: "1985-04-12T00:00:00Z"
-        type: string
-      gender:
-        enum:
-        - male
-        - female
-        example: male
-        type: string
-      name:
-        example: Doe
-        maxLength: 50
-        minLength: 1
-        type: string
-      patronymic:
-        example: Smith
-        maxLength: 50
-        minLength: 1
-        type: string
-      phone_number:
-        example: "+1234567890"
-        type: string
-      reset_avatar:
-        example: false
-        type: boolean
-      surname:
-        example: John
-        maxLength: 50
-        minLength: 1
-        type: string
-    required:
-    - reset_avatar
-    type: object
   handlers.UserSignUpRequest:
     properties:
       email:
@@ -376,7 +341,7 @@ paths:
       - BearerAuth: []
       summary: Delete user
       tags:
-      - Profile
+      - User
   /user/edit:
     put:
       consumes:
@@ -384,12 +349,11 @@ paths:
       description: Updates user profile details including name, surname, patronymic,
         date of birth, phone number, gender, and avatar.
       parameters:
-      - description: User profile data
-        in: body
+      - description: User profile data (JSON string)
+        in: formData
         name: json
         required: true
-        schema:
-          $ref: '#/definitions/handlers.UpdateUserRequest'
+        type: string
       - description: Avatar image file (optional)
         in: formData
         name: avatar
@@ -421,7 +385,7 @@ paths:
       - ApiKeyAuth: []
       summary: Update User Profile
       tags:
-      - Profile
+      - User
   /user/me:
     get:
       description: Retrieves the profile details of the authenticated user.
@@ -448,7 +412,7 @@ paths:
       - ApiKeyAuth: []
       summary: Get User Profile
       tags:
-      - Profile
+      - User
 securityDefinitions:
   ApiKeyAuth:
     in: header

@@ -110,17 +110,7 @@ func createBucketIfNotExists(client *s3.Client, bucket string) error {
 }
 
 func applyBucketPolicy(client *s3.Client, bucket string) error {
-	policy := `{
-		"Version": "2012-10-17",
-		"Statement": [
-			{
-				"Effect": "Allow",
-				"Action": ["s3:GetObject", "s3:PutObject"],
-				"Resource": "arn:aws:s3:::` + bucket + `/*",
-				"Principal": "*"
-			}
-		]
-	}`
+	policy := `{"Version":"2012-10-17","Statement":[{"Effect":"Allow","Principal":{"AWS":["*"]},"Action":["s3:GetObject"],"Resource":["arn:aws:s3:::useravatars/*"]}]}`
 
 	_, err := client.PutBucketPolicy(context.TODO(), &s3.PutBucketPolicyInput{
 		Bucket: &bucket,
@@ -143,7 +133,7 @@ func uploadDefaultAvatar(client *s3.Client, bucket string) error {
 	defer file.Close()
 	var multipartFile multipart.File = file
 
-	buf512, buf52, err := avatarManager.ParsingAvatarImage(&multipartFile)
+	buf52, buf512, err := avatarManager.ParsingAvatarImage(&multipartFile)
 	if err != nil {
 		return fmt.Errorf("failed to process default avatar image: %v", err)
 	}

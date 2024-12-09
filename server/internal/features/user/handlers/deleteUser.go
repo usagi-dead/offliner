@@ -13,7 +13,7 @@ import (
 //
 // @Summary      Delete user
 // @Description  Deletes the currently authenticated user based on the user ID retrieved from the request context.
-// @Tags         Profile
+// @Tags         User
 // @Accept       json
 // @Produce      json
 // @Security     BearerAuth

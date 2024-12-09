@@ -28,5 +28,5 @@ type UpdateUserRequest struct {
 	DateOfBirth *time.Time `json:"date_of_birth,omitempty" validate:"omitempty,lte" example:"1985-04-12T00:00:00Z"`
 	PhoneNumber *string    `json:"phone_number,omitempty" validate:"omitempty,e164" example:"+1234567890"`
 	Gender      *string    `json:"gender,omitempty" validate:"omitempty,oneof=male female" example:"male"`
-	ResetAvatar bool       `json:"reset_avatar,omitempty" validate:"required" example:"false"`
+	ResetAvatar bool       `json:"reset_avatar" default:"false" example:"false"`
 }

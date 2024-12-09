@@ -13,7 +13,7 @@ import (
 // @Security ApiKeyAuth
 // @Summary Get User Profile
 // @Description Retrieves the profile details of the authenticated user.
-// @Tags Profile
+// @Tags User
 // @Produce json
 // @Success 200 {object} response.Response "User profile retrieved successfully"
 // @Failure 401 {object} response.Response "Unauthorized user"
