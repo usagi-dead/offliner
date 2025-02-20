@@ -8,7 +8,7 @@ Frontend is made by [usagi.](https://github.com/usagi-dead)
 
 Backend is made by [shailuishai](https://github.com/shailuishai)
 
-View layout in [Figma](https://www.figma.com/design/uphs47zeE4f9aRiy2vWNT2/Offliner?node-id=0-1&t=EPzOXTi8MTe644zu-1)
+View layout at [Figma](https://www.figma.com/design/uphs47zeE4f9aRiy2vWNT2/Offliner?node-id=0-1&t=EPzOXTi8MTe644zu-1)
 
 ##
 
